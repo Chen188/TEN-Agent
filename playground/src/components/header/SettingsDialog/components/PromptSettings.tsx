@@ -13,17 +13,21 @@ interface PromptSettingsProps {
 const PromptSettings = ({ settings, dispatch, agentConnected }: PromptSettingsProps) => {
     return (
         <div className={styles.settingGroup}>
-            <div className={styles.settingItem}>
-                <div className={styles.label}>SYSTEM PROMPT</div>
-                <TextArea
-                    className={`${styles.textarea} dark`}
-                    disabled={agentConnected}
-                    value={settings.systemPrompt}
-                    rows={4}
-                    placeholder="Customize system prompt, leave blank to use default"
-                    onChange={e => dispatch({ type: 'SET_GENERAL', payload: { systemPrompt: e.target.value } })}
-                />
-            </div>
+            {
+                !settings.graphName.includes('dify') && (
+                    <div className={styles.settingItem}>
+                        <div className={styles.label}>SYSTEM PROMPT</div>
+                        <TextArea
+                            className={`${styles.textarea} dark`}
+                            disabled={agentConnected}
+                            value={settings.systemPrompt}
+                            rows={4}
+                            placeholder="Customize system prompt, leave blank to use default"
+                            onChange={e => dispatch({ type: 'SET_GENERAL', payload: { systemPrompt: e.target.value } })}
+                        />
+                    </div>
+                )
+            }
             <div className={styles.settingItem}>
                 <div className={styles.label}>GREETING</div>
                 <TextArea

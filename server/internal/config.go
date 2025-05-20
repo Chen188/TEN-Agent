@@ -164,6 +164,7 @@ var (
 		},
 		"MaxMemoryLength": {
 			{ExtensionName: extensionNameBedrockLLM, Property: "max_memory_length"},
+			{ExtensionName: extensionNameDify, Property: "max_history"},
 			{ExtensionName: extensionNameBedrockMCP, Property: "max_memory_length"},
 		},
 		"McpApiBase": {

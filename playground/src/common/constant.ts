@@ -28,7 +28,7 @@ export const GRAPH_NAME_OPTIONS = [
   {
     label: "Dify Knowledge Base",
     value: "va.dify.polly",
-    desc: "[Chat Mode] Transcribe ASR -> Dify KB -> Polly TTS"
+    desc: "[Chat Mode] Transcribe ASR -> Dify KB -> Polly TTS. System Prompt is not enabled for this graph."
   },
   {
     label: "Bedrock Base - Chat",
@@ -74,6 +74,10 @@ export const LANG_OPTIONS = [
   {
     label: "Chinese Simplified",
     value: "zh-CN"
+  },
+  {
+    label: "Chinese Cantonese",
+    value: "zh-HK"
   },
   {
     label: "Chinese Traditional",

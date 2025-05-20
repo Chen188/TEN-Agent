@@ -59,7 +59,7 @@ const SettingsDialog = ({ open, onClose }: { open: boolean; onClose: () => void 
                     />
                 </TabPane>
 
-                <TabPane tab="Prompt" key="prompt">
+                <TabPane tab="Prompt & Greeting" key="prompt">
                     <PromptSettings
                         settings={settings}
                         dispatch={dispatch}
