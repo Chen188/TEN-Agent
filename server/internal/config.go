@@ -27,6 +27,7 @@ const (
 	// Language
 	languageChinese            = "zh-CN"
 	languageChineseTraditional = "zh-TW"
+	languageChineseCantonese   = "zh-HK"
 	languageEnglish            = "en-US"
 	languageJapenese           = "ja-JP"
 	languageFrench             = "fr-FR"
@@ -260,6 +261,12 @@ var (
 			},
 		},
 		languageChineseTraditional: {
+			extensionNamePollyTTS: {
+				voiceTypeMale:   "Hiujin",
+				voiceTypeFemale: "Hiujin",
+			},
+		},
+		languageChineseCantonese: {
 			extensionNamePollyTTS: {
 				voiceTypeMale:   "Hiujin",
 				voiceTypeFemale: "Hiujin",
