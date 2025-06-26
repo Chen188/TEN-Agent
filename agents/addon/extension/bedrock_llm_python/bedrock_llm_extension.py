@@ -217,9 +217,9 @@ class BedrockLLMExtension(Extension):
                     full_content += content
 
                     while True:
-                        sentence, content, sentence_is_final = parse_sentence(
-                            sentence, content
-                        )
+                        sentence, content, sentence_is_final = parse_sentence(sentence, content)
+                        if self.bedrock_llm.config.mode == 'translate':
+                            sentence = sentence.replace('</translation>', '')
                         if not sentence or not sentence_is_final:
                             # logger.info(f"sentence [{sentence}] is empty or not final")
                             break
