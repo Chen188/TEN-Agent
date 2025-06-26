@@ -19,7 +19,20 @@ export const MODE_OPTIONS = [
     value: "translate"
   }
 ]
+
+export const MODE_OPTIONS_SONIC = [
+  {
+    label: "Chat",
+    value: "chat"
+  }
+]
+
 export const GRAPH_NAME_OPTIONS = [
+  {
+    label: "S2S/Amazon Nova Sonic",
+    value: "va.nova.sonic",
+    desc: "[Chat Mode] audio to audio model using Amazon Nova Sonic."
+  },
   {
     label: "MCP/Bedrock Base",
     value: "va.transcribe-bedrock_mcp.polly",
@@ -96,6 +109,41 @@ export const LANG_OPTIONS = [
     value: "hi-IN"
   }
 ]
+
+export const LANG_OPTIONS_SONIC = [
+  // {
+  //   label: "Auto",
+  //   value: "auto"
+  // },
+  {
+    label: "English(US)",
+    value: "en-US"
+  },
+  {
+    label: "English(UK)",
+    value: "en-UK"
+  },
+  {
+    label: "Spanish",
+    value: "es-ES"
+  },
+  {
+    label: "German(Disabled)",
+    value: "de-DE",
+    disabled: true
+  },
+  {
+    label: "French(Disabled)",
+    value: "fr-FR",
+    disabled: true
+  },
+  {
+    label: "Italian(Disabled)",
+    value: "it-IT",
+    disabled: true
+  },
+]
+
 export const VOICE_OPTIONS = [
   {
     label: "Male",
@@ -106,6 +154,7 @@ export const VOICE_OPTIONS = [
     value: "female"
   }
 ]
+
 export const COLOR_LIST: ColorItem[] = [{
   active: "#0888FF",
   default: "#112941"

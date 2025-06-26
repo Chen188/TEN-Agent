@@ -1,0 +1,1 @@
+EXTENSION_NAME = "nova_sonic_python"

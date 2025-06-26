@@ -16,6 +16,8 @@ interface StartRequestConfig {
   mcpApiBase?: string,
   mcpApiKey?: string,
   mcpModel?: string,
+  systemPrompt?: string,
+  novaSonicWsUrl?: string,
 }
 
 interface GenAgoraDataConfig {
@@ -59,6 +61,8 @@ export const apiStartService = async (config: StartRequestConfig): Promise<any> 
     mcpApiKey,
     mcpModel,
     maxMemoryLength,
+    systemPrompt,
+    novaSonicWsUrl
   } = config
   const data = {
     request_id: genUUID(),
@@ -77,6 +81,8 @@ export const apiStartService = async (config: StartRequestConfig): Promise<any> 
     mcp_api_base: mcpApiBase || "",
     mcp_api_key: mcpApiKey || "",
     mcp_model: mcpModel || "",
+    system_prompt: systemPrompt || "",
+    nova_sonic_ws_url: novaSonicWsUrl || "",
   }
   let resp: any = await fetch(url, {
     method: "POST",

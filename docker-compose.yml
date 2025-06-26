@@ -42,6 +42,17 @@ services:
             - "3000:3000"
         volumes:
             - ./:/app
+    nova_sonic_server:
+        image: ghcr.io/chen188/nova-sonic-server:latest
+        container_name: nova-sonic-server
+        restart: always
+        ports:
+            - "3333:3333"
+        environment:
+            AWS_REGION: ${AWS_REGION}
+            AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+            AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+
     astra_graph_designer:
         image: agoraio/astra_graph_designer:0.1.0
         container_name: astra_graph_designer

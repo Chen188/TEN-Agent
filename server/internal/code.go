@@ -16,6 +16,8 @@ var (
 	codeErrChannelEmpty        = NewCode("10004", "channel empty")
 	codeErrMcpApiBaseEmpty     = NewCode("10005", "MCP API Base empty")
 	codeErrGenerateTokenFailed = NewCode("10006", "generate token failed")
+	codeErrInvalidWebSocketUrl = NewCode("10007", "Invalid WebSocket URL")
+	codeErrUrlNotReachable     = NewCode("10008", "URL not reachable")
 
 	codeErrProcessPropertyFailed = NewCode("10100", "process property json failed")
 	codeErrStartWorkerFailed     = NewCode("10101", "start worker failed")

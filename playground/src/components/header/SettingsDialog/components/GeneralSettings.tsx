@@ -2,8 +2,10 @@ import { Select, Checkbox, Input } from "antd"
 import { InfoCircleOutlined, WarningFilled } from "@ant-design/icons"
 import {
     LANG_OPTIONS,
+    LANG_OPTIONS_SONIC,
     VOICE_OPTIONS,
     MODE_OPTIONS,
+    MODE_OPTIONS_SONIC,
     GRAPH_NAME_OPTIONS
 } from "@/common"
 import { SettingsState, SettingsAction } from "../hooks/useSettingsState"
@@ -33,16 +35,41 @@ const GeneralSettings = ({ settings, dispatch, agentConnected }: GeneralSettings
                             ? MODE_OPTIONS[1].value
                             : MODE_OPTIONS[0].value;
 
+                        const newLang = v.includes('nova.sonic')
+                            ? LANG_OPTIONS_SONIC[0].value
+                            : LANG_OPTIONS[0].value
+
+                        const newOutputLang = v.includes('translate')
+                            ? settings.outputLanguage
+                            : settings.lang;
+
                         dispatch({
                             type: 'SET_GENERAL',
                             payload: {
                                 graphName: v,
-                                mode: newMode
+                                mode: newMode,
+                                lang: newLang,
+                                outputLanguage: newOutputLang
                             }
                         })
                     }}
                 />
             </div>
+
+            {
+                settings.graphName.includes('nova.sonic') &&
+                <div className={styles.settingItem}>
+                    <div className={styles.label}>NOVA SONIC WEBSOCKET URL</div>
+                    <Input
+                        className={`${styles.input} dark`}
+                        disabled={agentConnected}
+                        value={settings.novaSonicWsUrl}
+                        placeholder="WebSocket URL for Nova Sonic(ws://)"
+                        onChange={e => dispatch({ type: 'SET_GENERAL', payload: { novaSonicWsUrl: e.target.value } })}
+                        style={{ flex: 1 }}
+                    />
+                </div>
+            }
 
             <div className={styles.settingItem}>
                 <div className={styles.label}>AGENT MODE</div>
@@ -59,7 +86,7 @@ const GeneralSettings = ({ settings, dispatch, agentConnected }: GeneralSettings
                     disabled={agentConnected}
                     className={`${styles.select} dark`}
                     value={settings.mode}
-                    options={MODE_OPTIONS}
+                    options={settings.graphName.includes('nova.sonic') ? MODE_OPTIONS_SONIC : MODE_OPTIONS}
                     onChange={v => dispatch({ type: 'SET_GENERAL', payload: { mode: v } })}
                 />
             </div>
@@ -70,7 +97,7 @@ const GeneralSettings = ({ settings, dispatch, agentConnected }: GeneralSettings
                     disabled={agentConnected}
                     className={`${styles.select} dark`}
                     value={settings.lang}
-                    options={LANG_OPTIONS}
+                    options={settings.graphName.includes('nova.sonic') ? LANG_OPTIONS_SONIC : LANG_OPTIONS}
                     onChange={v => {
                         const payload: Partial<SettingsState> = { lang: v };
                         if (settings.mode === "chat") {
@@ -122,17 +149,22 @@ const GeneralSettings = ({ settings, dispatch, agentConnected }: GeneralSettings
                 />
             </div>
 
-            <div className={styles.settingItem}>
-                <div className={styles.label}>MEMORY LENGTH</div>
-                <Input
-                    className={`${styles.input} dark`}
-                    disabled={agentConnected}
-                    value={settings.maxMemoryLength}
-                    placeholder="max chat histories preserved"
-                    onChange={e => dispatch({ type: 'SET_GENERAL', payload: { maxMemoryLength: +e.target.value } })}
-                    style={{ flex: 1 }}
-                />
-            </div>
+            {
+                !settings.graphName.includes('nova.sonic') &&
+                <>
+                    <div className={styles.settingItem}>
+                        <div className={styles.label}>MEMORY LENGTH</div>
+                        <Input
+                            className={`${styles.input} dark`}
+                            disabled={agentConnected}
+                            value={settings.maxMemoryLength}
+                            placeholder="max chat histories preserved"
+                            onChange={e => dispatch({ type: 'SET_GENERAL', payload: { maxMemoryLength: +e.target.value } })}
+                            style={{ flex: 1 }}
+                        />
+                    </div>
+                </>
+            }
         </div>
     )
 }

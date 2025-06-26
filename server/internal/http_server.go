@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -62,6 +63,7 @@ type StartReq struct {
 	McpApiBase           string `json:"mcp_api_base,omitempty"`
 	McpModel             string `json:"mcp_model,omitempty"`
 	McpSelectedServers   string `json:"mcp_selected_servers,omitempty"`
+	NovaSonicWsUrl       string `json:"nova_sonic_ws_url,omitempty"`
 }
 
 type StopReq struct {
@@ -139,6 +141,49 @@ func (s *HttpServer) handlerStart(c *gin.Context) {
 		slog.Error("handlerStart channel empty", "channelName", req.ChannelName, "requestId", req.RequestId, logTag)
 		s.output(c, codeErrChannelEmpty, http.StatusBadRequest)
 		return
+	}
+
+	// Check if Nova Sonic WebSocket URL is valid when using nova.sonic graph
+	if strings.Contains(req.GraphName, "nova.sonic") && req.NovaSonicWsUrl != "" {
+		// Check if the URL is valid
+		parsedURL, err := url.Parse(req.NovaSonicWsUrl)
+		if err != nil {
+			slog.Error("handlerStart invalid WebSocket URL", "url", req.NovaSonicWsUrl, "err", err, "requestId", req.RequestId, logTag)
+			s.output(c, codeErrInvalidWebSocketUrl, http.StatusBadRequest)
+			return
+		}
+
+		// Check if the URL uses the WebSocket protocol
+		if parsedURL.Scheme != "ws" && parsedURL.Scheme != "wss" {
+			slog.Error("handlerStart invalid WebSocket protocol", "url", req.NovaSonicWsUrl, "scheme", parsedURL.Scheme, "requestId", req.RequestId, logTag)
+			s.output(c, codeErrInvalidWebSocketUrl, http.StatusBadRequest)
+			return
+		}
+
+		// Check if the URL has a host
+		if parsedURL.Host == "" {
+			slog.Error("handlerStart invalid WebSocket URL (no host)", "url", req.NovaSonicWsUrl, "requestId", req.RequestId, logTag)
+			s.output(c, codeErrInvalidWebSocketUrl, http.StatusBadRequest)
+			return
+		}
+
+		// Check connectivity by converting ws:// to http:// or wss:// to https://
+		httpScheme := "http"
+		if parsedURL.Scheme == "wss" {
+			httpScheme = "https"
+		}
+		httpURL := fmt.Sprintf("%s://%s", httpScheme, parsedURL.Host)
+
+		// Try to connect to the server using the same HttpClient as in handlerMcpInfo
+		res, err := HttpClient.R().Get(httpURL)
+		if err != nil {
+			slog.Error("handlerStart WebSocket server not reachable", "url", req.NovaSonicWsUrl, "err", err, "requestId", req.RequestId, logTag)
+			s.output(c, codeErrUrlNotReachable, http.StatusBadRequest)
+			return
+		}
+
+		// We don't care about the status code, just that the server is reachable
+		slog.Info("handlerStart WebSocket server connectivity check", "url", req.NovaSonicWsUrl, "status", res.StatusCode(), "requestId", req.RequestId, logTag)
 	}
 
 	if workersRunning >= s.config.WorkersMax {

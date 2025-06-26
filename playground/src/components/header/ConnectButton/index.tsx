@@ -33,6 +33,8 @@ const ConnectButton = () => {
     const [mcpApiBase, setMcpApiBase] = useState("")
     const [mcpApiKey, setMcpApiKey] = useState("")
     const [mcpSelectedModel, setMcpSelectedModel] = useState("")
+    const [systemPrompt, setSystemPrompt] = useState("")
+    const [novaSonicWsUrl, setNovaSonicWsUrl] = useState("")
 
     // Load initial settings and listen for changes
     useEffect(() => {
@@ -51,6 +53,8 @@ const ConnectButton = () => {
                 setMcpApiBase(settings.mcpApiBase || "")
                 setMcpApiKey(settings.mcpApiKey || "")
                 setMcpSelectedModel(settings.mcpSelectedModel || "")
+                setSystemPrompt(settings.systemPrompt || "")
+                setNovaSonicWsUrl(settings.novaSonicWsUrl || "")
             }
         }
 
@@ -71,6 +75,8 @@ const ConnectButton = () => {
             setMcpApiBase(settings.mcpApiBase || "")
             setMcpApiKey(settings.mcpApiKey || "")
             setMcpSelectedModel(settings.mcpSelectedModel || "")
+            setSystemPrompt(settings.systemPrompt || "")
+            setNovaSonicWsUrl(settings.novaSonicWsUrl || "")
         }
 
         window.addEventListener('astra-settings-changed', handleSettingsChange as EventListener)
@@ -101,7 +107,9 @@ const ConnectButton = () => {
                 mcpSelectedServers: mcpSelectedServers.join(','),
                 mcpApiBase: mcpApiBase,
                 mcpApiKey: mcpApiKey,
-                mcpModel: mcpSelectedModel
+                mcpModel: mcpSelectedModel,
+                systemPrompt: systemPrompt,
+                novaSonicWsUrl: novaSonicWsUrl
             })
 
             if (res?.code != 0) {

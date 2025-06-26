@@ -21,6 +21,7 @@ export interface SettingsState {
     partialStabilization: boolean;
     voice: string;
     maxMemoryLength: number,
+    novaSonicWsUrl: string,
 
     // Prompt settings
     greeting: string;
@@ -54,6 +55,7 @@ const initialSettingsState: SettingsState = {
     greeting: "",
     systemPrompt: "",
     maxMemoryLength: 20,
+    novaSonicWsUrl: "",
     mcpApiKey: "",
     mcpApiBase: "http://localhost:7002",
     mcpConnected: false,

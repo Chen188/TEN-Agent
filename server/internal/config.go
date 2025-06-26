@@ -17,6 +17,7 @@ const (
 	extensionNameCosyTTS       = "cosy_tts"
 	extensionNameElevenlabsTTS = "elevenlabs_tts"
 	extensionNameLiteLLM       = "litellm"
+	extensionNameNovaSonic     = "nova_sonic"
 	extensionNameOpenaiChatgpt = "openai_chatgpt"
 	extensionNamePollyTTS      = "polly_tts"
 	extensionNameQwenLLM       = "qwen_llm"
@@ -29,10 +30,14 @@ const (
 	languageChineseTraditional = "zh-TW"
 	languageChineseCantonese   = "zh-HK"
 	languageEnglish            = "en-US"
+	languageEnglishGB          = "en-UK"
 	languageJapenese           = "ja-JP"
 	languageFrench             = "fr-FR"
+	languageGerman             = "de-DE"
+	languageSpanish            = "es-ES"
 	languageKorean             = "ko-KR"
 	languageHindi              = "hi-IN"
+	languageItalian            = "it-IT"
 
 	// Default graph name
 	graphNameDefault = "va.openai.azure"
@@ -59,6 +64,7 @@ var (
 			{ExtensionName: extensionNameSageMakerTTS, Property: "access_key"},
 			{ExtensionName: extensionNameTranscribeAsr, Property: "access_key"},
 			{ExtensionName: extensionNameSageMakerLLM, Property: "access_key"},
+			{ExtensionName: extensionNameNovaSonic, Property: "access_key"},
 		},
 		"AWS_SECRET_ACCESS_KEY": {
 			{ExtensionName: extensionNameBedrockLLM, Property: "secret_key"},
@@ -66,6 +72,7 @@ var (
 			{ExtensionName: extensionNameTranscribeAsr, Property: "secret_key"},
 			{ExtensionName: extensionNameSageMakerTTS, Property: "secret_key"},
 			{ExtensionName: extensionNameSageMakerLLM, Property: "secret_key"},
+			{ExtensionName: extensionNameNovaSonic, Property: "secret_key"},
 		},
 		"AWS_BEDROCK_MODEL": {
 			{ExtensionName: extensionNameBedrockLLM, Property: "model"},
@@ -76,6 +83,7 @@ var (
 			{ExtensionName: extensionNameTranscribeAsr, Property: "region"},
 			{ExtensionName: extensionNameSageMakerTTS, Property: "region"},
 			{ExtensionName: extensionNameSageMakerLLM, Property: "region"},
+			{ExtensionName: extensionNameNovaSonic, Property: "region"},
 		},
 		"AZURE_STT_KEY": {
 			{ExtensionName: extensionNameAgoraRTC, Property: "agora_asr_vendor_key"},
@@ -127,6 +135,10 @@ var (
 			{ExtensionName: extensionNameTranscribeAsr, Property: "lang_code"},
 			{ExtensionName: extensionNameBedrockLLM, Property: "input_language"},
 			{ExtensionName: extensionNameSageMakerLLM, Property: "input_language"},
+			{ExtensionName: extensionNameNovaSonic, Property: "lang_code"},
+		},
+		"NovaSonicWsUrl": {
+			{ExtensionName: extensionNameNovaSonic, Property: "websocket_url"},
 		},
 		"ChannelName": {
 			{ExtensionName: extensionNameAgoraRTC, Property: "channel"},
@@ -150,6 +162,7 @@ var (
 			{ExtensionName: extensionNameAzureTTS, Property: "azure_synthesis_voice_name"},
 			{ExtensionName: extensionNameElevenlabsTTS, Property: "voice_id"},
 			{ExtensionName: extensionNamePollyTTS, Property: "voice"},
+			{ExtensionName: extensionNameNovaSonic, Property: "voice"},
 		},
 		"PartialStabilization": {
 			{ExtensionName: extensionNameTranscribeAsr, Property: "enable_partial_results_stabilization"},
@@ -158,10 +171,12 @@ var (
 			{ExtensionName: extensionNameBedrockLLM, Property: "greeting"},
 			{ExtensionName: extensionNameDify, Property: "greeting"},
 			{ExtensionName: extensionNameBedrockMCP, Property: "greeting"},
+			{ExtensionName: extensionNameNovaSonic, Property: "greeting"},
 		},
 		"SystemPrompt": {
 			{ExtensionName: extensionNameBedrockLLM, Property: "prompt"},
 			{ExtensionName: extensionNameBedrockMCP, Property: "prompt"},
+			{ExtensionName: extensionNameNovaSonic, Property: "prompt"},
 		},
 		"MaxMemoryLength": {
 			{ExtensionName: extensionNameBedrockLLM, Property: "max_memory_length"},
@@ -210,6 +225,16 @@ var (
 			extensionNamePollyTTS: {
 				voiceTypeMale:   "Matthew",
 				voiceTypeFemale: "Ruth",
+			},
+			extensionNameNovaSonic: {
+				voiceTypeMale:   "matthew",
+				voiceTypeFemale: "tiffany",
+			},
+		},
+		languageEnglishGB: {
+			extensionNameNovaSonic: {
+				voiceTypeMale:   "amy",
+				voiceTypeFemale: "amy",
 			},
 		},
 		languageJapenese: {
@@ -270,6 +295,12 @@ var (
 			extensionNamePollyTTS: {
 				voiceTypeMale:   "Hiujin",
 				voiceTypeFemale: "Hiujin",
+			},
+		},
+		languageSpanish: {
+			extensionNameNovaSonic: {
+				voiceTypeMale:   "carlos",
+				voiceTypeFemale: "lupe",
 			},
 		},
 	}

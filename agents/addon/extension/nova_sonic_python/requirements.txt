@@ -1,0 +1,2 @@
+websocket-client==1.5.1
+python-socketio==5.8.0
