@@ -35,6 +35,7 @@ const (
 	languageFrench             = "fr-FR"
 	languageGerman             = "de-DE"
 	languageSpanish            = "es-ES"
+	languagePortuguese         = "pt-BR"
 	languageKorean             = "ko-KR"
 	languageHindi              = "hi-IN"
 	languageItalian            = "it-IT"
@@ -195,6 +196,12 @@ var (
 		"McpModel": {
 			{ExtensionName: extensionNameBedrockMCP, Property: "model"},
 		},
+		"PolyglotVoiceEnabled": {
+			{ExtensionName: extensionNameNovaSonic, Property: "polyglot_voice_enabled"},
+		},
+		"TurnTakingPauseSensitivity": {
+			{ExtensionName: extensionNameNovaSonic, Property: "turn_taking_pause_sensitivity"},
+		},
 	}
 
 	// Map the voice name to the voice type
@@ -264,6 +271,10 @@ var (
 				voiceTypeMale:   "Remi",
 				voiceTypeFemale: "Lea",
 			},
+			extensionNameNovaSonic: {
+				voiceTypeMale:   "remi",
+				voiceTypeFemale: "lea",
+			},
 		},
 		languageKorean: {
 			extensionNameAzureTTS: {
@@ -284,6 +295,10 @@ var (
 				voiceTypeMale:   "Kajal",
 				voiceTypeFemale: "Kajal",
 			},
+			extensionNameNovaSonic: {
+				voiceTypeMale:   "karan",
+				voiceTypeFemale: "kajal",
+			},
 		},
 		languageChineseTraditional: {
 			extensionNamePollyTTS: {
@@ -301,6 +316,24 @@ var (
 			extensionNameNovaSonic: {
 				voiceTypeMale:   "carlos",
 				voiceTypeFemale: "lupe",
+			},
+		},
+		languagePortuguese: {
+			extensionNameNovaSonic: {
+				voiceTypeMale:   "thiago",
+				voiceTypeFemale: "camila",
+			},
+		},
+		languageGerman: {
+			extensionNameNovaSonic: {
+				voiceTypeMale:   "daniel",
+				voiceTypeFemale: "vicki",
+			},
+		},
+		languageItalian: {
+			extensionNameNovaSonic: {
+				voiceTypeMale:   "adriano",
+				voiceTypeFemale: "bianca",
 			},
 		},
 	}

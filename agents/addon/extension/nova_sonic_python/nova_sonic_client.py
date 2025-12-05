@@ -18,6 +18,11 @@ LANG_MAP = {
     "en-US": ['tiffany', 'matthew'],
     "en-UK": ['amy'],
     "es-ES": ['lupe', 'carlos'],
+    "pt-BR": ['camila', 'thiago'],
+    "hi-IN": ['kajal', 'karan'],
+    "fr-FR": ['lea', 'remi'],
+    "de-DE": ['vicki', 'daniel'],
+    "it-IT": ['bianca', 'adriano'],
 }
 
 class NovaSonicConfig:
@@ -32,6 +37,8 @@ class NovaSonicConfig:
                  voice: str = 'tiffany',
                  greeting: str = '',
                  prompt: str = '',
+                 polyglot_voice_enabled: str = 'false',
+                 turn_taking_pause_sensitivity: str = 'medium',
                  ):
         self.region = region
         self.access_key = access_key
@@ -43,6 +50,8 @@ class NovaSonicConfig:
         self.voice = voice
         self.greeting = greeting
         self.prompt = prompt
+        self.polyglot_voice_enabled = polyglot_voice_enabled.lower() == 'true'
+        self.turn_taking_pause_sensitivity = turn_taking_pause_sensitivity
 
     @classmethod
     def default_config(cls):
@@ -60,6 +69,11 @@ class NovaSonicConfig:
             logger.warning("using default system prompt")
             self.prompt = "You are a helpful AI assistant. You communicate clearly and concisely." \
                             "Please respond to the user's questions or requests in a friendly manner."
+        
+        # Validate turn-taking pause sensitivity
+        if self.turn_taking_pause_sensitivity not in ['low', 'medium', 'high']:
+            logger.warning(f"invalid turn_taking_pause_sensitivity: [{self.turn_taking_pause_sensitivity}], fallback to 'medium'")
+            self.turn_taking_pause_sensitivity = 'medium'
 
 class TextGenerationStage(Enum):
     SPECULATIVE = 'SPECULATIVE'
@@ -118,10 +132,28 @@ class AsyncNovaSonicClient:
         self._start_session()
 
     def _start_session(self):
-        # Start a new session
-        self.sio.emit('promptStart', {
+        # Start a new session with Nova Sonic v2 configuration
+        session_config = {
             "voiceId": self.config.voice
-        })
+        }
+        
+        # Add polyglot voice capability if enabled
+        if self.config.polyglot_voice_enabled:
+            session_config["polyglotVoice"] = True
+            logger.info("Polyglot voice capability enabled")
+        
+        # Add turn-taking controllability settings
+        pause_sensitivity_map = {
+            'low': 1.5,      # Longer pause before interrupting (1.5 seconds)
+            'medium': 1.0,   # Medium pause (1.0 seconds)
+            'high': 0.5      # Shorter pause, more responsive (0.5 seconds)
+        }
+        session_config["turnTakingPauseSensitivity"] = pause_sensitivity_map.get(
+            self.config.turn_taking_pause_sensitivity, 1.0
+        )
+        logger.info(f"Turn-taking pause sensitivity set to: {self.config.turn_taking_pause_sensitivity}")
+        
+        self.sio.emit('promptStart', session_config)
         
         # Use a default system prompt
         system_prompt = self.config.prompt

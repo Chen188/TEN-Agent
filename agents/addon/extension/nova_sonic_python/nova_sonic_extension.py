@@ -26,6 +26,8 @@ PROPERTY_LANG_CODE   = 'lang_code'  # Optional
 PROPERTY_GREETING   = 'greeting'  # Optional
 PROPERTY_PROMPT     = 'prompt'  # Optional
 PROPERTY_VOICE      = 'voice'  # Optional
+PROPERTY_POLYGLOT_VOICE_ENABLED = 'polyglot_voice_enabled'  # Optional
+PROPERTY_TURN_TAKING_PAUSE_SENSITIVITY = 'turn_taking_pause_sensitivity'  # Optional
 
 class NovaSonicExtension(Extension):
     def __init__(self, name: str):
@@ -49,7 +51,8 @@ class NovaSonicExtension(Extension):
 
         for optional_param in [PROPERTY_REGION, PROPERTY_SAMPLE_RATE_IN, PROPERTY_SAMPLE_RATE_OUT, 
                 PROPERTY_ACCESS_KEY, PROPERTY_SECRET_KEY, PROPERTY_WEBSOCKET_URL,
-                PROPERTY_LANG_CODE, PROPERTY_GREETING, PROPERTY_PROMPT, PROPERTY_VOICE]:
+                PROPERTY_LANG_CODE, PROPERTY_GREETING, PROPERTY_PROMPT, PROPERTY_VOICE,
+                PROPERTY_POLYGLOT_VOICE_ENABLED, PROPERTY_TURN_TAKING_PAUSE_SENSITIVITY]:
             try:
                 value = rte.get_property_string(optional_param).strip()
                 # logger.info(f'param: {optional_param}, value: {value}')
@@ -59,7 +62,9 @@ class NovaSonicExtension(Extension):
                 logger.info(f"GetProperty optional {optional_param} failed, err: {err}. Using default value: {sonic_config.__getattribute__(optional_param)}")
 
         sonic_config.validate_config()
-        logger.info(f"Nova Sonic config - voice: {sonic_config.voice}, lang_code: {sonic_config.lang_code}")
+        logger.info(f"Nova Sonic config - voice: {sonic_config.voice}, lang_code: {sonic_config.lang_code}, "
+                   f"polyglot_voice_enabled: {sonic_config.polyglot_voice_enabled}, "
+                   f"turn_taking_pause_sensitivity: {sonic_config.turn_taking_pause_sensitivity}")
 
         self.sonic_client = AsyncNovaSonicClient(sonic_config, self.queue, rte, self.loop)
 

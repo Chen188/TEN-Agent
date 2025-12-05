@@ -22,6 +22,8 @@ export interface SettingsState {
     voice: string;
     maxMemoryLength: number,
     novaSonicWsUrl: string,
+    polyglotVoiceEnabled: boolean,
+    turnTakingPauseSensitivity: string,
 
     // Prompt settings
     greeting: string;
@@ -56,6 +58,8 @@ const initialSettingsState: SettingsState = {
     systemPrompt: "",
     maxMemoryLength: 20,
     novaSonicWsUrl: "",
+    polyglotVoiceEnabled: false,
+    turnTakingPauseSensitivity: "medium",
     mcpApiKey: "",
     mcpApiBase: "http://localhost:7002",
     mcpConnected: false,

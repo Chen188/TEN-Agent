@@ -18,6 +18,8 @@ interface StartRequestConfig {
   mcpModel?: string,
   systemPrompt?: string,
   novaSonicWsUrl?: string,
+  polyglotVoiceEnabled?: boolean,
+  turnTakingPauseSensitivity?: string,
 }
 
 interface GenAgoraDataConfig {
@@ -62,7 +64,9 @@ export const apiStartService = async (config: StartRequestConfig): Promise<any> 
     mcpModel,
     maxMemoryLength,
     systemPrompt,
-    novaSonicWsUrl
+    novaSonicWsUrl,
+    polyglotVoiceEnabled,
+    turnTakingPauseSensitivity
   } = config
   const data = {
     request_id: genUUID(),
@@ -83,6 +87,8 @@ export const apiStartService = async (config: StartRequestConfig): Promise<any> 
     mcp_model: mcpModel || "",
     system_prompt: systemPrompt || "",
     nova_sonic_ws_url: novaSonicWsUrl || "",
+    polyglot_voice_enabled: polyglotVoiceEnabled || false,
+    turn_taking_pause_sensitivity: turnTakingPauseSensitivity || "medium",
   }
   let resp: any = await fetch(url, {
     method: "POST",
