@@ -18,7 +18,6 @@ interface StartRequestConfig {
   mcpModel?: string,
   systemPrompt?: string,
   novaSonicWsUrl?: string,
-  polyglotVoiceEnabled?: boolean,
   turnTakingPauseSensitivity?: string,
 }
 
@@ -65,7 +64,6 @@ export const apiStartService = async (config: StartRequestConfig): Promise<any> 
     maxMemoryLength,
     systemPrompt,
     novaSonicWsUrl,
-    polyglotVoiceEnabled,
     turnTakingPauseSensitivity
   } = config
   const data = {
@@ -87,8 +85,7 @@ export const apiStartService = async (config: StartRequestConfig): Promise<any> 
     mcp_model: mcpModel || "",
     system_prompt: systemPrompt || "",
     nova_sonic_ws_url: novaSonicWsUrl || "",
-    polyglot_voice_enabled: polyglotVoiceEnabled || false,
-    turn_taking_pause_sensitivity: turnTakingPauseSensitivity || "medium",
+    turn_taking_pause_sensitivity: turnTakingPauseSensitivity || "MEDIUM",
   }
   let resp: any = await fetch(url, {
     method: "POST",

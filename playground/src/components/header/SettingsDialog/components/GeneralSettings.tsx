@@ -75,27 +75,6 @@ const GeneralSettings = ({ settings, dispatch, agentConnected }: GeneralSettings
             {
                 settings.graphName.includes('nova.sonic') &&
                 <div className={styles.settingItem}>
-                    <div className={styles.label}>POLYGLOT VOICE</div>
-                    <div className={styles.desc}>
-                        <InfoCircleOutlined className={styles.infoIcon} /> Enable to speak different languages with native expressivity using the same voice
-                    </div>
-                    <Checkbox
-                        disabled={agentConnected}
-                        className={`${styles.checkbox} dark`}
-                        checked={settings.polyglotVoiceEnabled}
-                        onChange={e => dispatch({
-                            type: 'SET_GENERAL',
-                            payload: { polyglotVoiceEnabled: e.target.checked }
-                        })}
-                    >
-                        Enable Polyglot Voice
-                    </Checkbox>
-                </div>
-            }
-
-            {
-                settings.graphName.includes('nova.sonic') &&
-                <div className={styles.settingItem}>
                     <div className={styles.label}>TURN-TAKING PAUSE SENSITIVITY</div>
                     <div className={styles.desc}>
                         <InfoCircleOutlined className={styles.infoIcon} /> {TURN_TAKING_PAUSE_SENSITIVITY_OPTIONS.find(o => o.value === settings.turnTakingPauseSensitivity)?.desc}

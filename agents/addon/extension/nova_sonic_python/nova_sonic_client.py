@@ -37,8 +37,7 @@ class NovaSonicConfig:
                  voice: str = 'tiffany',
                  greeting: str = '',
                  prompt: str = '',
-                 polyglot_voice_enabled: str = 'false',
-                 turn_taking_pause_sensitivity: str = 'medium',
+                 turn_taking_pause_sensitivity: str = 'MEDIUM',
                  ):
         self.region = region
         self.access_key = access_key
@@ -50,14 +49,18 @@ class NovaSonicConfig:
         self.voice = voice
         self.greeting = greeting
         self.prompt = prompt
-        self.polyglot_voice_enabled = polyglot_voice_enabled.lower() == 'true'
-        self.turn_taking_pause_sensitivity = turn_taking_pause_sensitivity
+        self.turn_taking_pause_sensitivity = turn_taking_pause_sensitivity.upper()
 
     @classmethod
     def default_config(cls):
         return cls()
     
     def validate_config(self):
+        # Handle "auto" language mode - default to en-US
+        if self.lang_code == 'auto':
+            logger.info("Auto language mode selected, defaulting to en-US")
+            self.lang_code = 'en-US'
+        
         if self.lang_code not in LANG_MAP.keys():
             logger.warning(f"invalid lang_code: [{self.lang_code}], fallback to 'en-US'")
             self.lang_code = 'en-US'
@@ -70,10 +73,10 @@ class NovaSonicConfig:
             self.prompt = "You are a helpful AI assistant. You communicate clearly and concisely." \
                             "Please respond to the user's questions or requests in a friendly manner."
         
-        # Validate turn-taking pause sensitivity
-        if self.turn_taking_pause_sensitivity not in ['low', 'medium', 'high']:
-            logger.warning(f"invalid turn_taking_pause_sensitivity: [{self.turn_taking_pause_sensitivity}], fallback to 'medium'")
-            self.turn_taking_pause_sensitivity = 'medium'
+        # Validate turn-taking pause sensitivity (uppercase)
+        if self.turn_taking_pause_sensitivity not in ['LOW', 'MEDIUM', 'HIGH']:
+            logger.warning(f"invalid turn_taking_pause_sensitivity: [{self.turn_taking_pause_sensitivity}], fallback to 'MEDIUM'")
+            self.turn_taking_pause_sensitivity = 'MEDIUM'
 
 class TextGenerationStage(Enum):
     SPECULATIVE = 'SPECULATIVE'
@@ -137,21 +140,21 @@ class AsyncNovaSonicClient:
             "voiceId": self.config.voice
         }
         
-        # Add polyglot voice capability if enabled
-        if self.config.polyglot_voice_enabled:
-            session_config["polyglotVoice"] = True
-            logger.info("Polyglot voice capability enabled")
-        
-        # Add turn-taking controllability settings
-        pause_sensitivity_map = {
-            'low': 1.5,      # Longer pause before interrupting (1.5 seconds)
-            'medium': 1.0,   # Medium pause (1.0 seconds)
-            'high': 0.5      # Shorter pause, more responsive (0.5 seconds)
+        # Add turn-taking controllability settings with uppercase sensitivity values
+        # Map to endpointingSensitivity values
+        sensitivity_map = {
+            'LOW': 'LOW',       # Longer pause before interrupting
+            'MEDIUM': 'MEDIUM', # Medium pause
+            'HIGH': 'HIGH'      # Shorter pause, more responsive
         }
-        session_config["turnTakingPauseSensitivity"] = pause_sensitivity_map.get(
-            self.config.turn_taking_pause_sensitivity, 1.0
+        endpointing_sensitivity = sensitivity_map.get(
+            self.config.turn_taking_pause_sensitivity, 'MEDIUM'
         )
-        logger.info(f"Turn-taking pause sensitivity set to: {self.config.turn_taking_pause_sensitivity}")
+        
+        session_config["turnDetectionConfiguration"] = {
+            "endpointingSensitivity": endpointing_sensitivity
+        }
+        logger.info(f"Turn-taking pause sensitivity set to: {self.config.turn_taking_pause_sensitivity} (endpointingSensitivity: {endpointing_sensitivity})")
         
         self.sio.emit('promptStart', session_config)
         

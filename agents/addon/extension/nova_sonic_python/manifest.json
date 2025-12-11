@@ -42,9 +42,6 @@
             "lang_code": {
                 "type": "string"
             },
-            "polyglot_voice_enabled": {
-                "type": "bool"
-            },
             "turn_taking_pause_sensitivity": {
                 "type": "string"
             }

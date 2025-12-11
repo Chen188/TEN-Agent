@@ -35,8 +35,7 @@ const ConnectButton = () => {
     const [mcpSelectedModel, setMcpSelectedModel] = useState("")
     const [systemPrompt, setSystemPrompt] = useState("")
     const [novaSonicWsUrl, setNovaSonicWsUrl] = useState("")
-    const [polyglotVoiceEnabled, setPolyglotVoiceEnabled] = useState(false)
-    const [turnTakingPauseSensitivity, setTurnTakingPauseSensitivity] = useState("medium")
+    const [turnTakingPauseSensitivity, setTurnTakingPauseSensitivity] = useState("MEDIUM")
 
     // Load initial settings and listen for changes
     useEffect(() => {
@@ -57,8 +56,7 @@ const ConnectButton = () => {
                 setMcpSelectedModel(settings.mcpSelectedModel || "")
                 setSystemPrompt(settings.systemPrompt || "")
                 setNovaSonicWsUrl(settings.novaSonicWsUrl || "")
-                setPolyglotVoiceEnabled(settings.polyglotVoiceEnabled || false)
-                setTurnTakingPauseSensitivity(settings.turnTakingPauseSensitivity || "medium")
+                setTurnTakingPauseSensitivity(settings.turnTakingPauseSensitivity || "MEDIUM")
             }
         }
 
@@ -81,8 +79,7 @@ const ConnectButton = () => {
             setMcpSelectedModel(settings.mcpSelectedModel || "")
             setSystemPrompt(settings.systemPrompt || "")
             setNovaSonicWsUrl(settings.novaSonicWsUrl || "")
-            setPolyglotVoiceEnabled(settings.polyglotVoiceEnabled || false)
-            setTurnTakingPauseSensitivity(settings.turnTakingPauseSensitivity || "medium")
+            setTurnTakingPauseSensitivity(settings.turnTakingPauseSensitivity || "MEDIUM")
         }
 
         window.addEventListener('astra-settings-changed', handleSettingsChange as EventListener)
@@ -116,7 +113,6 @@ const ConnectButton = () => {
                 mcpModel: mcpSelectedModel,
                 systemPrompt: systemPrompt,
                 novaSonicWsUrl: novaSonicWsUrl,
-                polyglotVoiceEnabled: polyglotVoiceEnabled,
                 turnTakingPauseSensitivity: turnTakingPauseSensitivity
             })
 

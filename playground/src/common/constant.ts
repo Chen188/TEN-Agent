@@ -31,7 +31,7 @@ export const GRAPH_NAME_OPTIONS = [
   {
     label: "S2S/Amazon Nova Sonic",
     value: "va.nova.sonic",
-    desc: "[Chat Mode] audio to audio model using Amazon Nova Sonic v2 with polyglot voice and turn-taking controllability."
+    desc: "[Chat Mode] audio to audio model using Amazon Nova Sonic v2 with turn-taking controllability and support for 7 languages."
   },
   {
     label: "MCP/Bedrock Base",
@@ -111,10 +111,10 @@ export const LANG_OPTIONS = [
 ]
 
 export const LANG_OPTIONS_SONIC = [
-  // {
-  //   label: "Auto",
-  //   value: "auto"
-  // },
+  {
+    label: "Auto",
+    value: "auto"
+  },
   {
     label: "English(US)",
     value: "en-US"
@@ -163,18 +163,18 @@ export const VOICE_OPTIONS = [
 export const TURN_TAKING_PAUSE_SENSITIVITY_OPTIONS = [
   {
     label: "Low",
-    value: "low",
-    desc: "Longer pause before interrupting (1.5 seconds)"
+    value: "LOW",
+    desc: "Longer pause before interrupting"
   },
   {
     label: "Medium",
-    value: "medium",
-    desc: "Balanced pause sensitivity (1.0 seconds)"
+    value: "MEDIUM",
+    desc: "Balanced pause sensitivity"
   },
   {
     label: "High",
-    value: "high",
-    desc: "Shorter pause, more responsive (0.5 seconds)"
+    value: "HIGH",
+    desc: "Shorter pause, more responsive"
   }
 ]
 
