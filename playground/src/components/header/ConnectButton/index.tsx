@@ -35,6 +35,7 @@ const ConnectButton = () => {
     const [mcpSelectedModel, setMcpSelectedModel] = useState("")
     const [systemPrompt, setSystemPrompt] = useState("")
     const [novaSonicWsUrl, setNovaSonicWsUrl] = useState("")
+    const [turnTakingPauseSensitivity, setTurnTakingPauseSensitivity] = useState("MEDIUM")
 
     // Load initial settings and listen for changes
     useEffect(() => {
@@ -55,6 +56,7 @@ const ConnectButton = () => {
                 setMcpSelectedModel(settings.mcpSelectedModel || "")
                 setSystemPrompt(settings.systemPrompt || "")
                 setNovaSonicWsUrl(settings.novaSonicWsUrl || "")
+                setTurnTakingPauseSensitivity(settings.turnTakingPauseSensitivity || "MEDIUM")
             }
         }
 
@@ -77,6 +79,7 @@ const ConnectButton = () => {
             setMcpSelectedModel(settings.mcpSelectedModel || "")
             setSystemPrompt(settings.systemPrompt || "")
             setNovaSonicWsUrl(settings.novaSonicWsUrl || "")
+            setTurnTakingPauseSensitivity(settings.turnTakingPauseSensitivity || "MEDIUM")
         }
 
         window.addEventListener('astra-settings-changed', handleSettingsChange as EventListener)
@@ -109,7 +112,8 @@ const ConnectButton = () => {
                 mcpApiKey: mcpApiKey,
                 mcpModel: mcpSelectedModel,
                 systemPrompt: systemPrompt,
-                novaSonicWsUrl: novaSonicWsUrl
+                novaSonicWsUrl: novaSonicWsUrl,
+                turnTakingPauseSensitivity: turnTakingPauseSensitivity
             })
 
             if (res?.code != 0) {

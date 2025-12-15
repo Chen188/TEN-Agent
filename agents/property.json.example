@@ -42,7 +42,8 @@
                             "prompt": "",
                             "greeting": "ASTRA agent connected. How can i help you today?",
                             "voice": "tiffany",
-                            "lang_code": "en-US"
+                            "lang_code": "en-US",
+                            "turn_taking_pause_sensitivity": "MEDIUM"
                         }
                     },
                     {

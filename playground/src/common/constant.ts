@@ -31,7 +31,7 @@ export const GRAPH_NAME_OPTIONS = [
   {
     label: "S2S/Amazon Nova Sonic",
     value: "va.nova.sonic",
-    desc: "[Chat Mode] audio to audio model using Amazon Nova Sonic."
+    desc: "[Chat Mode] audio to audio model using Amazon Nova Sonic v2 with turn-taking controllability and support for 7 languages."
   },
   {
     label: "MCP/Bedrock Base",
@@ -111,10 +111,10 @@ export const LANG_OPTIONS = [
 ]
 
 export const LANG_OPTIONS_SONIC = [
-  // {
-  //   label: "Auto",
-  //   value: "auto"
-  // },
+  {
+    label: "Auto",
+    value: "auto"
+  },
   {
     label: "English(US)",
     value: "en-US"
@@ -128,19 +128,24 @@ export const LANG_OPTIONS_SONIC = [
     value: "es-ES"
   },
   {
-    label: "German(Disabled)",
-    value: "de-DE",
-    disabled: true
+    label: "Portuguese",
+    value: "pt-BR"
   },
   {
-    label: "French(Disabled)",
-    value: "fr-FR",
-    disabled: true
+    label: "Hindi",
+    value: "hi-IN"
   },
   {
-    label: "Italian(Disabled)",
-    value: "it-IT",
-    disabled: true
+    label: "French",
+    value: "fr-FR"
+  },
+  {
+    label: "German",
+    value: "de-DE"
+  },
+  {
+    label: "Italian",
+    value: "it-IT"
   },
 ]
 
@@ -152,6 +157,24 @@ export const VOICE_OPTIONS = [
   {
     label: "Female",
     value: "female"
+  }
+]
+
+export const TURN_TAKING_PAUSE_SENSITIVITY_OPTIONS = [
+  {
+    label: "Low",
+    value: "LOW",
+    desc: "Longer pause before interrupting"
+  },
+  {
+    label: "Medium",
+    value: "MEDIUM",
+    desc: "Balanced pause sensitivity"
+  },
+  {
+    label: "High",
+    value: "HIGH",
+    desc: "Shorter pause, more responsive"
   }
 ]
 

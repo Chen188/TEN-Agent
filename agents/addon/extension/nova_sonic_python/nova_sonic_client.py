@@ -7,7 +7,7 @@ import socketio
 import requests
 from typing import Optional, Dict, Any, List, Callable, Tuple
 from enum import Enum
-
+import urllib.parse
 from rte import Data, RteEnv, PcmFrame, PcmFrameDataFmt, Cmd
 
 from .log import logger
@@ -18,6 +18,11 @@ LANG_MAP = {
     "en-US": ['tiffany', 'matthew'],
     "en-UK": ['amy'],
     "es-ES": ['lupe', 'carlos'],
+    "pt-BR": ['camila', 'thiago'],
+    "hi-IN": ['kajal', 'karan'],
+    "fr-FR": ['lea', 'remi'],
+    "de-DE": ['vicki', 'daniel'],
+    "it-IT": ['bianca', 'adriano'],
 }
 
 class NovaSonicConfig:
@@ -32,6 +37,7 @@ class NovaSonicConfig:
                  voice: str = 'tiffany',
                  greeting: str = '',
                  prompt: str = '',
+                 turn_taking_pause_sensitivity: str = 'MEDIUM',
                  ):
         self.region = region
         self.access_key = access_key
@@ -43,12 +49,23 @@ class NovaSonicConfig:
         self.voice = voice
         self.greeting = greeting
         self.prompt = prompt
+        self.inference_config = {
+            "maxTokens": 2048,
+            "topP": 0.95,
+            "temperature": 0.8
+        }
+        self.turn_taking_pause_sensitivity =turn_taking_pause_sensitivity.upper()
 
     @classmethod
     def default_config(cls):
         return cls()
     
     def validate_config(self):
+        # Handle "auto" language mode - default to en-US
+        if self.lang_code == 'auto':
+            logger.info("Auto language mode selected, defaulting to en-US")
+            self.lang_code = 'en-US'
+        
         if self.lang_code not in LANG_MAP.keys():
             logger.warning(f"invalid lang_code: [{self.lang_code}], fallback to 'en-US'")
             self.lang_code = 'en-US'
@@ -60,6 +77,11 @@ class NovaSonicConfig:
             logger.warning("using default system prompt")
             self.prompt = "You are a helpful AI assistant. You communicate clearly and concisely." \
                             "Please respond to the user's questions or requests in a friendly manner."
+        
+        # Validate turn-taking pause sensitivity (uppercase)
+        if self.turn_taking_pause_sensitivity not in ['LOW', 'MEDIUM', 'HIGH']:
+            logger.warning(f"invalid turn_taking_pause_sensitivity: [{self.turn_taking_pause_sensitivity}], fallback to 'MEDIUM'")
+            self.turn_taking_pause_sensitivity = 'MEDIUM'
 
 class TextGenerationStage(Enum):
     SPECULATIVE = 'SPECULATIVE'
@@ -118,10 +140,12 @@ class AsyncNovaSonicClient:
         self._start_session()
 
     def _start_session(self):
-        # Start a new session
-        self.sio.emit('promptStart', {
+        # Start a new session with Nova Sonic v2 configuration
+        session_config = {
             "voiceId": self.config.voice
-        })
+        }
+        
+        self.sio.emit('promptStart')
         
         # Use a default system prompt
         system_prompt = self.config.prompt
@@ -204,37 +228,33 @@ class AsyncNovaSonicClient:
             # Decode base64 audio data
             audio_bytes = base64.b64decode(audio_content)
             
+            if len(audio_bytes) == 0:
+                logger.warning("Empty audio bytes after decoding")
+                return
+            
             # Get the sample rate from config
             sample_rate_out = int(self.config.sample_rate_out)
-            
-            # Calculate frame size (10ms chunks)
             bytes_per_sample = 2  # 16-bit audio
             channels = 1  # mono
-            frame_size = int(sample_rate_out * bytes_per_sample * channels / 100)  # 10ms chunks
             
-            # Process audio in chunks
-            for i in range(0, len(audio_bytes), frame_size):
-                chunk = audio_bytes[i:i+frame_size]
+            # Calculate actual samples from received data
+            actual_samples = len(audio_bytes) // (bytes_per_sample * channels)
+            
+            # Create PCM frame with actual received data size (no padding)
+            f = PcmFrame.create("pcm_frame")
+            f.set_sample_rate(sample_rate_out)
+            f.set_bytes_per_sample(bytes_per_sample)
+            f.set_number_of_channels(channels)
+            f.set_data_fmt(PcmFrameDataFmt.INTERLEAVE)
+            f.set_samples_per_channel(actual_samples)
+            f.alloc_buf(len(audio_bytes))
 
-                # If chunk is smaller than frame_size, pad with zeros
-                if len(chunk) < frame_size:
-                    chunk = chunk + bytes(frame_size - len(chunk))
-                
-                # Create PCM frame
-                f = PcmFrame.create("pcm_frame")
-                f.set_sample_rate(sample_rate_out)
-                f.set_bytes_per_sample(bytes_per_sample)
-                f.set_number_of_channels(channels)
-                f.set_data_fmt(PcmFrameDataFmt.INTERLEAVE)
-                f.set_samples_per_channel(int(sample_rate_out / 100))  # 10ms of samples
-                f.alloc_buf(frame_size)
+            buff = f.lock_buf()
+            buff[:] = audio_bytes
+            f.unlock_buf(buff)
 
-                buff = f.lock_buf()
-                buff[:] = chunk
-                f.unlock_buf(buff)
-
-                # Send PCM frame
-                self.rte.send_pcm_frame(f)
+            # Send PCM frame as-is without chunking or padding
+            self.rte.send_pcm_frame(f)
         except Exception as e:
             logger.exception(f"Error handling audio output: {e}")
     
@@ -248,8 +268,17 @@ class AsyncNovaSonicClient:
             elif url.startswith("wss://"):
                 url = url[6:]
 
-            logger.info(f"Connecting to WebSocket server at {url}")
-            self.sio.connect(f"http://{url}")
+            session_config = {
+                "inferenceConfig": self.config.inference_config,
+                "turnDetectionConfiguration": {
+                    "endpointingSensitivity": self.config.turn_taking_pause_sensitivity
+                }
+            };
+
+            config_param = urllib.parse.urlencode({'config': json.dumps(session_config)})
+            url = f"http://{url}?{config_param}"
+            # logger.info(f"Connecting to WebSocket server at {url}")
+            self.sio.connect(url)
             return True
         except Exception as e:
             logger.exception(f"Failed to connect to WebSocket server: {e}")

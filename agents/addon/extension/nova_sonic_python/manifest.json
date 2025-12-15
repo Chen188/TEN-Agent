@@ -41,6 +41,9 @@
             },
             "lang_code": {
                 "type": "string"
+            },
+            "turn_taking_pause_sensitivity": {
+                "type": "string"
             }
         },
         "pcm_frame_in": [

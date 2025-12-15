@@ -6,7 +6,8 @@ import {
     VOICE_OPTIONS,
     MODE_OPTIONS,
     MODE_OPTIONS_SONIC,
-    GRAPH_NAME_OPTIONS
+    GRAPH_NAME_OPTIONS,
+    TURN_TAKING_PAUSE_SENSITIVITY_OPTIONS
 } from "@/common"
 import { SettingsState, SettingsAction } from "../hooks/useSettingsState"
 import styles from "../index.module.scss"
@@ -67,6 +68,23 @@ const GeneralSettings = ({ settings, dispatch, agentConnected }: GeneralSettings
                         placeholder="WebSocket URL for Nova Sonic(ws://)"
                         onChange={e => dispatch({ type: 'SET_GENERAL', payload: { novaSonicWsUrl: e.target.value } })}
                         style={{ flex: 1 }}
+                    />
+                </div>
+            }
+
+            {
+                settings.graphName.includes('nova.sonic') &&
+                <div className={styles.settingItem}>
+                    <div className={styles.label}>TURN-TAKING PAUSE SENSITIVITY</div>
+                    <div className={styles.desc}>
+                        <InfoCircleOutlined className={styles.infoIcon} /> {TURN_TAKING_PAUSE_SENSITIVITY_OPTIONS.find(o => o.value === settings.turnTakingPauseSensitivity)?.desc}
+                    </div>
+                    <Select
+                        disabled={agentConnected}
+                        className={`${styles.select} dark`}
+                        value={settings.turnTakingPauseSensitivity}
+                        options={TURN_TAKING_PAUSE_SENSITIVITY_OPTIONS}
+                        onChange={v => dispatch({ type: 'SET_GENERAL', payload: { turnTakingPauseSensitivity: v } })}
                     />
                 </div>
             }

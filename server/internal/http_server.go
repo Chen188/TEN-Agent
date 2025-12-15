@@ -46,24 +46,25 @@ type PingReq struct {
 }
 
 type StartReq struct {
-	RequestId            string `json:"request_id,omitempty"`
-	AgoraAsrLanguage     string `json:"agora_asr_language,omitempty"`
-	ChannelName          string `json:"channel_name,omitempty"`
-	GraphName            string `json:"graph_name,omitempty"`
-	Mode                 string `json:"mode,omitempty"`
-	OutputLanguage       string `json:"output_language,omitempty"`
-	RemoteStreamId       uint32 `json:"remote_stream_id,omitempty"`
-	Token                string `json:"token,omitempty"`
-	VoiceType            string `json:"voice_type,omitempty"`
-	PartialStabilization bool   `json:"enable_partial_results_stabilization,omitempty"`
-	Greeting             string `json:"greeting,omitempty"`
-	SystemPrompt         string `json:"system_prompt,omitempty"`
-	MaxMemoryLength      int    `json:"max_memory_length,omitempty"`
-	McpApiKey            string `json:"mcp_api_key,omitempty"`
-	McpApiBase           string `json:"mcp_api_base,omitempty"`
-	McpModel             string `json:"mcp_model,omitempty"`
-	McpSelectedServers   string `json:"mcp_selected_servers,omitempty"`
-	NovaSonicWsUrl       string `json:"nova_sonic_ws_url,omitempty"`
+	RequestId                  string `json:"request_id,omitempty"`
+	AgoraAsrLanguage           string `json:"agora_asr_language,omitempty"`
+	ChannelName                string `json:"channel_name,omitempty"`
+	GraphName                  string `json:"graph_name,omitempty"`
+	Mode                       string `json:"mode,omitempty"`
+	OutputLanguage             string `json:"output_language,omitempty"`
+	RemoteStreamId             uint32 `json:"remote_stream_id,omitempty"`
+	Token                      string `json:"token,omitempty"`
+	VoiceType                  string `json:"voice_type,omitempty"`
+	PartialStabilization       bool   `json:"enable_partial_results_stabilization,omitempty"`
+	Greeting                   string `json:"greeting,omitempty"`
+	SystemPrompt               string `json:"system_prompt,omitempty"`
+	MaxMemoryLength            int    `json:"max_memory_length,omitempty"`
+	McpApiKey                  string `json:"mcp_api_key,omitempty"`
+	McpApiBase                 string `json:"mcp_api_base,omitempty"`
+	McpModel                   string `json:"mcp_model,omitempty"`
+	McpSelectedServers         string `json:"mcp_selected_servers,omitempty"`
+	NovaSonicWsUrl             string `json:"nova_sonic_ws_url,omitempty"`
+	TurnTakingPauseSensitivity string `json:"turn_taking_pause_sensitivity,omitempty"`
 }
 
 type StopReq struct {
