@@ -1,0 +1,115 @@
+# ===================================================
+# TEN-Agent Terraform Configuration - Example Variables
+# ===================================================
+# Copy this file to terraform.tfvars and fill in your actual values
+# WARNING: Do not commit terraform.tfvars with sensitive data to version control
+
+# ----- General Configuration -----
+project_name = "ten-agent"
+environment  = "dev"
+aws_region   = "us-west-2"
+
+# ----- Networking Configuration -----
+vpc_cidr             = "10.0.0.0/16"
+availability_zones   = ["us-west-2a", "us-west-2b"]
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+
+# ----- ECS Configuration -----
+enable_container_insights = true
+
+# astra_agents service
+astra_agents_cpu           = 2048
+astra_agents_memory        = 4096
+astra_agents_desired_count = 1
+
+# astra_playground service
+astra_playground_cpu           = 512
+astra_playground_memory        = 1024
+astra_playground_desired_count = 1
+
+# nova_sonic service
+nova_sonic_cpu           = 1024
+nova_sonic_memory        = 2048
+nova_sonic_desired_count = 1
+
+# graph_designer service
+graph_designer_cpu           = 512
+graph_designer_memory        = 1024
+graph_designer_desired_count = 1
+
+# ----- Container Images -----
+astra_agents_image     = "ghcr.io/ten-framework/astra_agents_build:0.3.5"
+astra_playground_image = "node:20-alpine"
+nova_sonic_image       = "ghcr.io/chen188/nova-sonic-server:latest"
+graph_designer_image   = "agoraio/astra_graph_designer:0.1.0"
+
+# ----- Port Configuration -----
+graph_designer_server_port = 8001
+server_port                = 8080
+playground_port            = 3000
+nova_sonic_port            = 3333
+graph_designer_ui_port     = 3001
+
+# ----- Load Balancer Configuration -----
+enable_alb                       = true
+alb_ingress_cidr_blocks          = ["0.0.0.0/0"]
+health_check_path                = "/"
+health_check_interval            = 30
+health_check_timeout             = 5
+health_check_healthy_threshold   = 2
+health_check_unhealthy_threshold = 3
+
+# ----- CloudWatch Logs -----
+log_retention_days = 7
+log_path           = "/var/log/ten-agent"
+
+# ----- Auto Scaling -----
+enable_autoscaling         = false
+autoscaling_min_capacity   = 1
+autoscaling_max_capacity   = 4
+autoscaling_cpu_target     = 75
+autoscaling_memory_target  = 75
+
+# ----- Secrets Configuration -----
+# IMPORTANT: These are sensitive values. Use environment variables or AWS Secrets Manager to provide them.
+# For Terraform Cloud/Enterprise, use sensitive variables.
+# For local development, use environment variables like: export TF_VAR_agora_app_id="your-value"
+
+# Agora Configuration
+agora_app_id          = "" # Set via TF_VAR_agora_app_id environment variable
+agora_app_certificate = "" # Set via TF_VAR_agora_app_certificate environment variable
+
+# AWS Configuration for Application
+aws_access_key_id     = "" # Set via TF_VAR_aws_access_key_id environment variable
+aws_secret_access_key = "" # Set via TF_VAR_aws_secret_access_key environment variable
+aws_bedrock_model     = "" # e.g., "anthropic.claude-v2"
+
+# Azure Configuration
+azure_stt_key    = "" # Set via TF_VAR_azure_stt_key environment variable
+azure_stt_region = "" # e.g., "eastus"
+azure_tts_key    = "" # Set via TF_VAR_azure_tts_key environment variable
+azure_tts_region = "" # e.g., "eastus"
+
+# TTS Services
+cosy_tts_key       = "" # Set via TF_VAR_cosy_tts_key environment variable
+elevenlabs_tts_key = "" # Set via TF_VAR_elevenlabs_tts_key environment variable
+
+# LLM Configuration
+litellm_model = "" # e.g., "gpt-4"
+
+# OpenAI Configuration
+openai_api_key   = "" # Set via TF_VAR_openai_api_key environment variable
+openai_base_url  = "" # Optional: custom base URL
+openai_model     = "gpt-4"
+openai_proxy_url = "" # Optional: proxy URL
+
+# Qwen Configuration
+qwen_api_key = "" # Set via TF_VAR_qwen_api_key environment variable
+
+# ----- Tags -----
+tags = {
+  Owner       = "DevOps Team"
+  CostCenter  = "Engineering"
+  Application = "TEN-Agent"
+}
