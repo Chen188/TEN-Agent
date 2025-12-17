@@ -47,7 +47,6 @@ aws sts get-caller-identity
   - [ ] ghcr.io/ten-framework/astra_agents_build:0.3.5
   - [ ] node:20-alpine
   - [ ] ghcr.io/chen188/nova-sonic-server:latest
-  - [ ] agoraio/astra_graph_designer:0.1.0
 
 ### 5. 配置文件准备
 - [ ] 已复制 terraform.tfvars.example
@@ -184,11 +183,6 @@ curl http://$ALB_DNS/playground
 curl http://$ALB_DNS/nova-sonic
 ```
 
-- [ ] graph_designer 服务响应
-```bash
-curl http://$ALB_DNS/graph-designer
-```
-
 ### 3. 日志检查
 - [ ] astra_agents 日志正常
 ```bash
@@ -203,11 +197,6 @@ curl http://$ALB_DNS/graph-designer
 - [ ] nova_sonic 日志正常
 ```bash
 ./deploy.sh logs dev nova-sonic
-```
-
-- [ ] graph_designer 日志正常
-```bash
-./deploy.sh logs dev graph-designer
 ```
 
 - [ ] 无严重错误或异常

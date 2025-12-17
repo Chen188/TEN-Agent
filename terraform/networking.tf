@@ -329,36 +329,6 @@ resource "aws_lb_target_group" "nova_sonic" {
   )
 }
 
-resource "aws_lb_target_group" "graph_designer" {
-  count       = var.enable_alb ? 1 : 0
-  name        = "${local.name_prefix}-graph-designer-tg"
-  port        = 3000
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
-  target_type = "ip"
-
-  health_check {
-    enabled             = true
-    path                = var.health_check_path
-    port                = "traffic-port"
-    protocol            = "HTTP"
-    interval            = var.health_check_interval
-    timeout             = var.health_check_timeout
-    healthy_threshold   = var.health_check_healthy_threshold
-    unhealthy_threshold = var.health_check_unhealthy_threshold
-    matcher             = "200-299"
-  }
-
-  deregistration_delay = 30
-
-  tags = merge(
-    local.common_tags,
-    {
-      Name = "${local.name_prefix}-graph-designer-tg"
-    }
-  )
-}
-
 # ----- ALB Listeners -----
 resource "aws_lb_listener" "http" {
   count             = var.enable_alb ? 1 : 0
@@ -407,25 +377,6 @@ resource "aws_lb_listener_rule" "nova_sonic" {
   condition {
     path_pattern {
       values = ["/nova-sonic*"]
-    }
-  }
-
-  tags = local.common_tags
-}
-
-resource "aws_lb_listener_rule" "graph_designer" {
-  count        = var.enable_alb ? 1 : 0
-  listener_arn = aws_lb_listener.http[0].arn
-  priority     = 102
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.graph_designer[0].arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/graph-designer*"]
     }
   }
 

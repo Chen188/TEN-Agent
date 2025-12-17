@@ -113,24 +113,6 @@ variable "nova_sonic_desired_count" {
   default     = 1
 }
 
-variable "graph_designer_cpu" {
-  description = "CPU units for graph_designer service"
-  type        = number
-  default     = 512
-}
-
-variable "graph_designer_memory" {
-  description = "Memory for graph_designer service in MB"
-  type        = number
-  default     = 1024
-}
-
-variable "graph_designer_desired_count" {
-  description = "Desired number of graph_designer tasks"
-  type        = number
-  default     = 1
-}
-
 # ----- Container Images -----
 variable "astra_agents_image" {
   description = "Docker image for astra_agents service"
@@ -148,12 +130,6 @@ variable "nova_sonic_image" {
   description = "Docker image for nova_sonic_server service"
   type        = string
   default     = "ghcr.io/chen188/nova-sonic-server:latest"
-}
-
-variable "graph_designer_image" {
-  description = "Docker image for graph_designer service"
-  type        = string
-  default     = "agoraio/astra_graph_designer:0.1.0"
 }
 
 # ----- Port Configuration -----
@@ -179,12 +155,6 @@ variable "nova_sonic_port" {
   description = "Port for nova sonic server"
   type        = number
   default     = 3333
-}
-
-variable "graph_designer_ui_port" {
-  description = "Port for graph designer UI"
-  type        = number
-  default     = 3001
 }
 
 # ----- Secrets Configuration -----

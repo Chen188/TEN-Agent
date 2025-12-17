@@ -128,16 +128,6 @@ output "nova_sonic_service_id" {
   value       = aws_ecs_service.nova_sonic.id
 }
 
-output "graph_designer_service_name" {
-  description = "Name of the graph_designer ECS service"
-  value       = aws_ecs_service.graph_designer.name
-}
-
-output "graph_designer_service_id" {
-  description = "ID of the graph_designer ECS service"
-  value       = aws_ecs_service.graph_designer.id
-}
-
 # ----- ECS Task Definition Outputs -----
 output "astra_agents_task_definition_arn" {
   description = "ARN of the astra_agents task definition"
@@ -152,11 +142,6 @@ output "astra_playground_task_definition_arn" {
 output "nova_sonic_task_definition_arn" {
   description = "ARN of the nova_sonic task definition"
   value       = aws_ecs_task_definition.nova_sonic.arn
-}
-
-output "graph_designer_task_definition_arn" {
-  description = "ARN of the graph_designer task definition"
-  value       = aws_ecs_task_definition.graph_designer.arn
 }
 
 # ----- IAM Outputs -----
@@ -198,11 +183,6 @@ output "nova_sonic_log_group" {
   value       = aws_cloudwatch_log_group.nova_sonic.name
 }
 
-output "graph_designer_log_group" {
-  description = "CloudWatch log group for graph_designer"
-  value       = aws_cloudwatch_log_group.graph_designer.name
-}
-
 # ----- Target Group Outputs -----
 output "astra_agents_target_group_arn" {
   description = "ARN of astra_agents target group"
@@ -219,11 +199,6 @@ output "nova_sonic_target_group_arn" {
   value       = var.enable_alb ? aws_lb_target_group.nova_sonic[0].arn : null
 }
 
-output "graph_designer_target_group_arn" {
-  description = "ARN of graph_designer target group"
-  value       = var.enable_alb ? aws_lb_target_group.graph_designer[0].arn : null
-}
-
 # ----- Service Endpoints -----
 output "service_endpoints" {
   description = "Service endpoints for accessing each service via ALB"
@@ -231,7 +206,6 @@ output "service_endpoints" {
     astra_agents     = "http://${aws_lb.main[0].dns_name}"
     astra_playground = "http://${aws_lb.main[0].dns_name}/playground"
     nova_sonic       = "http://${aws_lb.main[0].dns_name}/nova-sonic"
-    graph_designer   = "http://${aws_lb.main[0].dns_name}/graph-designer"
   } : {}
 }
 
@@ -245,11 +219,9 @@ output "aws_cli_commands" {
 
     view_logs_nova_sonic = "aws logs tail ${aws_cloudwatch_log_group.nova_sonic.name} --follow --region ${var.aws_region}"
 
-    view_logs_graph_designer = "aws logs tail ${aws_cloudwatch_log_group.graph_designer.name} --follow --region ${var.aws_region}"
-
     list_tasks = "aws ecs list-tasks --cluster ${aws_ecs_cluster.main.name} --region ${var.aws_region}"
 
-    describe_services = "aws ecs describe-services --cluster ${aws_ecs_cluster.main.name} --services ${aws_ecs_service.astra_agents.name} ${aws_ecs_service.astra_playground.name} ${aws_ecs_service.nova_sonic.name} ${aws_ecs_service.graph_designer.name} --region ${var.aws_region}"
+    describe_services = "aws ecs describe-services --cluster ${aws_ecs_cluster.main.name} --services ${aws_ecs_service.astra_agents.name} ${aws_ecs_service.astra_playground.name} ${aws_ecs_service.nova_sonic.name} --region ${var.aws_region}"
 
     update_service = "aws ecs update-service --cluster ${aws_ecs_cluster.main.name} --service <SERVICE_NAME> --force-new-deployment --region ${var.aws_region}"
   }
@@ -264,12 +236,11 @@ output "deployment_summary" {
     region            = var.aws_region
     ecs_cluster       = aws_ecs_cluster.main.name
     load_balancer_url = var.enable_alb ? "http://${aws_lb.main[0].dns_name}" : "ALB not enabled"
-    services_deployed = 4
+    services_deployed = 3
     service_names = [
       aws_ecs_service.astra_agents.name,
       aws_ecs_service.astra_playground.name,
-      aws_ecs_service.nova_sonic.name,
-      aws_ecs_service.graph_designer.name
+      aws_ecs_service.nova_sonic.name
     ]
   }
 }

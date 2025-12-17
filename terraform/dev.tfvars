@@ -31,23 +31,16 @@ nova_sonic_cpu           = 512  # Lower for dev
 nova_sonic_memory        = 1024 # Lower for dev
 nova_sonic_desired_count = 1
 
-# graph_designer service
-graph_designer_cpu           = 512
-graph_designer_memory        = 1024
-graph_designer_desired_count = 1
-
 # ----- Container Images -----
 astra_agents_image     = "ghcr.io/ten-framework/astra_agents_build:0.3.5"
 astra_playground_image = "node:20-alpine"
 nova_sonic_image       = "ghcr.io/chen188/nova-sonic-server:latest"
-graph_designer_image   = "agoraio/astra_graph_designer:0.1.0"
 
 # ----- Port Configuration -----
 graph_designer_server_port = 8001
 server_port                = 8080
 playground_port            = 3000
 nova_sonic_port            = 3333
-graph_designer_ui_port     = 3001
 
 # ----- Load Balancer Configuration -----
 enable_alb                       = true

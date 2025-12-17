@@ -219,11 +219,6 @@
    - 端口: 3333
    - 密钥: 3 个
 
-4. **graph-designer** - 图形设计器
-   - 镜像: agoraio/astra_graph_designer:0.1.0
-   - 端口: 3000
-   - 密钥: 无
-
 ---
 
 ## 🔐 安全配置

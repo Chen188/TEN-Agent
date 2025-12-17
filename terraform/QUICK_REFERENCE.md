@@ -25,7 +25,6 @@
 ./deploy.sh logs dev astra-agents       # astra_agents 日志
 ./deploy.sh logs dev playground         # playground 日志
 ./deploy.sh logs dev nova-sonic         # nova sonic 日志
-./deploy.sh logs dev graph-designer     # graph designer 日志
 
 # 扩展服务
 ./deploy.sh scale dev astra-agents 3    # 扩展到 3 个实例
@@ -143,7 +142,6 @@ aws secretsmanager update-secret --secret-id $SECRET_NAME --secret-string '{"KEY
 | astra_agents_dev | astra-agents | astra_agents_service_name |
 | astra_playground_dev | astra-playground | astra_playground_service_name |
 | nova_sonic_server | nova-sonic-server | nova_sonic_service_name |
-| astra_graph_designer | graph-designer | graph_designer_service_name |
 
 ## 🔑 密钥列表
 
@@ -187,7 +185,6 @@ aws secretsmanager update-secret --secret-id $SECRET_NAME --secret-string '{"KEY
 | astra_agents | 8001 | N/A |
 | astra_playground | 3000 | /playground* |
 | nova_sonic | 3333 | /nova-sonic* |
-| graph_designer | 3000 | /graph-designer* |
 
 ## 💰 资源配置对比
 
@@ -195,7 +192,6 @@ aws secretsmanager update-secret --secret-id $SECRET_NAME --secret-string '{"KEY
 - astra_agents: 1 vCPU, 2 GB
 - astra_playground: 0.5 vCPU, 1 GB
 - nova_sonic: 0.5 vCPU, 1 GB
-- graph_designer: 0.5 vCPU, 1 GB
 - 副本数: 各 1 个
 - 自动扩展: 关闭
 
@@ -203,7 +199,6 @@ aws secretsmanager update-secret --secret-id $SECRET_NAME --secret-string '{"KEY
 - astra_agents: 4 vCPU, 8 GB
 - astra_playground: 1 vCPU, 2 GB
 - nova_sonic: 2 vCPU, 4 GB
-- graph_designer: 1 vCPU, 2 GB
 - 副本数: 各 2 个
 - 自动扩展: 开启（2-10 实例）
 

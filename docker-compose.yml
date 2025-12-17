@@ -52,10 +52,3 @@ services:
             AWS_REGION: ${AWS_REGION}
             AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
             AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-
-    astra_graph_designer:
-        image: agoraio/astra_graph_designer:0.1.0
-        container_name: astra_graph_designer
-        restart: always
-        ports:
-            - "3001:3000"

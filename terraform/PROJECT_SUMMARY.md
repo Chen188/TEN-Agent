@@ -46,7 +46,6 @@ terraform/
 | astra_agents_dev | ghcr.io/ten-framework/astra_agents_build:0.3.5 | 8080, 8001 | 18个 |
 | astra_playground_dev | node:20-alpine | 3000 | 0个 |
 | nova_sonic_server | ghcr.io/chen188/nova-sonic-server:latest | 3333 | 3个 |
-| astra_graph_designer | agoraio/astra_graph_designer:0.1.0 | 3001→3000 | 0个 |
 
 ### 2. 密钥管理
 
@@ -79,15 +78,15 @@ terraform/
 - ✅ 路由表 (1个公有 + 2-3个私有)
 - ✅ 安全组 (2个：ALB + ECS任务)
 - ✅ Application Load Balancer (1个)
-- ✅ 目标组 (4个，每服务一个)
+- ✅ 目标组 (3个，每服务一个)
 - ✅ ALB监听器和路由规则
 - ✅ VPC Endpoint (S3)
 
 #### 计算层 (ecs.tf)
 - ✅ ECS 集群 (1个)
-- ✅ ECS 任务定义 (4个，Fargate模式)
-- ✅ ECS 服务 (4个)
-- ✅ CloudWatch 日志组 (4个)
+- ✅ ECS 任务定义 (3个，Fargate模式)
+- ✅ ECS 服务 (3个)
+- ✅ CloudWatch 日志组 (3个)
 - ✅ IAM 角色 (2个：任务执行 + 应用)
 - ✅ IAM 策略 (自定义权限)
 - ✅ 自动扩展配置 (可选)
@@ -108,7 +107,6 @@ terraform/
 | astra_agents | 1 vCPU, 2GB, 1副本 |
 | astra_playground | 0.5 vCPU, 1GB, 1副本 |
 | nova_sonic | 0.5 vCPU, 1GB, 1副本 |
-| graph_designer | 0.5 vCPU, 1GB, 1副本 |
 | 日志保留 | 3天 |
 | 自动扩展 | 关闭 |
 | 估算成本 | $155-195/月 |
@@ -121,7 +119,6 @@ terraform/
 | astra_agents | 4 vCPU, 8GB, 2副本 |
 | astra_playground | 1 vCPU, 2GB, 2副本 |
 | nova_sonic | 2 vCPU, 4GB, 2副本 |
-| graph_designer | 1 vCPU, 2GB, 2副本 |
 | 日志保留 | 30天 |
 | 自动扩展 | 启用 (2-10实例) |
 | 估算成本 | $481-681/月 |

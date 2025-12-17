@@ -31,24 +31,17 @@ nova_sonic_cpu           = 2048 # Higher for prod
 nova_sonic_memory        = 4096 # Higher for prod
 nova_sonic_desired_count = 2    # Multiple instances for HA
 
-# graph_designer service
-graph_designer_cpu           = 1024
-graph_designer_memory        = 2048
-graph_designer_desired_count = 2 # Multiple instances for HA
-
 # ----- Container Images -----
 # In production, consider using specific version tags instead of 'latest'
 astra_agents_image     = "ghcr.io/ten-framework/astra_agents_build:0.3.5"
 astra_playground_image = "node:20-alpine"
 nova_sonic_image       = "ghcr.io/chen188/nova-sonic-server:latest" # Consider specific version
-graph_designer_image   = "agoraio/astra_graph_designer:0.1.0"
 
 # ----- Port Configuration -----
 graph_designer_server_port = 8001
 server_port                = 8080
 playground_port            = 3000
 nova_sonic_port            = 3333
-graph_designer_ui_port     = 3001
 
 # ----- Load Balancer Configuration -----
 enable_alb                       = true

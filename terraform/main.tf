@@ -135,21 +135,5 @@ locals {
       ]
       health_check_path = "/"
     }
-    graph_designer = {
-      name          = "graph-designer"
-      image         = var.graph_designer_image
-      cpu           = var.graph_designer_cpu
-      memory        = var.graph_designer_memory
-      desired_count = var.graph_designer_desired_count
-      port_mappings = [
-        {
-          container_port = 3000
-          host_port      = var.graph_designer_ui_port
-          protocol       = "tcp"
-        }
-      ]
-      environment_secrets = []
-      health_check_path   = "/"
-    }
   }
 }

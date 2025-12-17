@@ -56,18 +56,6 @@ resource "aws_cloudwatch_log_group" "nova_sonic" {
   )
 }
 
-resource "aws_cloudwatch_log_group" "graph_designer" {
-  name              = "/ecs/${local.name_prefix}/graph-designer"
-  retention_in_days = var.log_retention_days
-
-  tags = merge(
-    local.common_tags,
-    {
-      Name = "${local.name_prefix}-graph-designer-logs"
-    }
-  )
-}
-
 # ----- IAM Role for ECS Task Execution -----
 resource "aws_iam_role" "ecs_task_execution" {
   name = "${local.name_prefix}-ecs-task-execution-role"
@@ -392,49 +380,6 @@ resource "aws_ecs_task_definition" "nova_sonic" {
   )
 }
 
-# ----- ECS Task Definition: graph_designer -----
-resource "aws_ecs_task_definition" "graph_designer" {
-  family                   = "${local.name_prefix}-graph-designer"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = var.graph_designer_cpu
-  memory                   = var.graph_designer_memory
-  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
-  task_role_arn            = aws_iam_role.ecs_task.arn
-
-  container_definitions = jsonencode([
-    {
-      name  = "graph-designer"
-      image = var.graph_designer_image
-
-      portMappings = [
-        {
-          containerPort = 3000
-          protocol      = "tcp"
-        }
-      ]
-
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.graph_designer.name
-          "awslogs-region"        = var.aws_region
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
-
-      essential = true
-    }
-  ])
-
-  tags = merge(
-    local.common_tags,
-    {
-      Name = "${local.name_prefix}-graph-designer-task"
-    }
-  )
-}
-
 # ----- ECS Service: astra_agents -----
 resource "aws_ecs_service" "astra_agents" {
   name            = "${local.name_prefix}-astra-agents"
@@ -539,42 +484,6 @@ resource "aws_ecs_service" "nova_sonic" {
     local.common_tags,
     {
       Name = "${local.name_prefix}-nova-sonic-service"
-    }
-  )
-}
-
-# ----- ECS Service: graph_designer -----
-resource "aws_ecs_service" "graph_designer" {
-  name            = "${local.name_prefix}-graph-designer"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.graph_designer.arn
-  desired_count   = var.graph_designer_desired_count
-  launch_type     = "FARGATE"
-
-  network_configuration {
-    subnets          = aws_subnet.private[*].id
-    security_groups  = [aws_security_group.ecs_tasks.id]
-    assign_public_ip = false
-  }
-
-  dynamic "load_balancer" {
-    for_each = var.enable_alb ? [1] : []
-    content {
-      target_group_arn = aws_lb_target_group.graph_designer[0].arn
-      container_name   = "graph-designer"
-      container_port   = 3000
-    }
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.ecs_task_execution,
-    aws_iam_role_policy_attachment.secrets_access
-  ]
-
-  tags = merge(
-    local.common_tags,
-    {
-      Name = "${local.name_prefix}-graph-designer-service"
     }
   )
 }

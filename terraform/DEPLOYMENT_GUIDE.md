@@ -227,9 +227,6 @@ aws logs tail $(terraform output -raw astra_playground_log_group) --follow
 
 # 查看 nova_sonic 日志
 aws logs tail $(terraform output -raw nova_sonic_log_group) --follow
-
-# 查看 graph_designer 日志
-aws logs tail $(terraform output -raw graph_designer_log_group) --follow
 ```
 
 ## 🔄 更新部署
@@ -331,10 +328,6 @@ aws ecs update-service --cluster $CLUSTER_NAME \
 
 aws ecs update-service --cluster $CLUSTER_NAME \
   --service $(terraform output -raw nova_sonic_service_name) \
-  --desired-count 0
-
-aws ecs update-service --cluster $CLUSTER_NAME \
-  --service $(terraform output -raw graph_designer_service_name) \
   --desired-count 0
 ```
 

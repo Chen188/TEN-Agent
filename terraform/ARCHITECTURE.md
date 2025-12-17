@@ -20,7 +20,6 @@
                     │   /           → astra_agents     │
                     │   /playground → playground       │
                     │   /nova-sonic → nova_sonic       │
-                    │   /graph-designer → designer     │
                     └───────────┬────────────────────┘
                                 │
         ┌───────────────────────┼───────────────────────┐
@@ -73,13 +72,6 @@
         │  │  │  │ Port: 3333      │  │  │    │
         │  │  │  └──────────────────┘  │  │    │
         │  │  │                         │  │    │
-        │  │  │  ┌──────────────────┐  │  │    │
-        │  │  │  │ graph_designer   │  │  │    │
-        │  │  │  │ CPU: 0.5-1 vCPU │  │  │    │
-        │  │  │  │ Mem: 1-2 GB     │  │  │    │
-        │  │  │  │ Port: 3000      │  │  │    │
-        │  │  │  └──────────────────┘  │  │    │
-        │  │  │                         │  │    │
         │  │  └─────────────────────────┘  │    │
         │  │                                │    │
         │  └────────────────────────────────┘    │
@@ -97,7 +89,7 @@
 │                  │                    │ - astra_agents   │
 │ - AGORA_APP_ID   │                    │ - playground     │
 │ - OPENAI_API_KEY │                    │ - nova_sonic     │
-│ - AWS_KEYS       │                    │ - graph_designer │
+│ - AWS_KEYS       │                    │                  │
 │ - AZURE_KEYS     │                    │                  │
 │ ... (12 secrets) │                    └──────────────────┘
 └──────────────────┘
@@ -129,11 +121,10 @@
 - **监听器**: HTTP:80
 - **健康检查**: 每30秒
 
-#### 目标组 (4个)
+#### 目标组 (3个)
 - **astra_agents**: Port 8080
 - **astra_playground**: Port 3000
 - **nova_sonic**: Port 3333
-- **graph_designer**: Port 3000
 
 ### 3. 计算层
 
@@ -142,7 +133,7 @@
 - **网络模式**: awsvpc
 - **Container Insights**: 启用
 
-#### 服务 (4个)
+#### 服务 (3个)
 
 ##### astra_agents
 ```
@@ -172,16 +163,6 @@ CPU: 512-2048 (0.5-2 vCPU)
 副本: 1-2 (dev-prod)
 端口: 3333
 密钥: 3 个环境变量
-```
-
-##### graph_designer
-```
-镜像: agoraio/astra_graph_designer:0.1.0
-CPU: 512-1024 (0.5-1 vCPU)
-内存: 1024-2048 MB (1-2 GB)
-副本: 1-2 (dev-prod)
-端口: 3000
-密钥: 无
 ```
 
 ### 4. 安全层

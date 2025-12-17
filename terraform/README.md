@@ -31,7 +31,6 @@
 1. **astra_agents** - TEN-Agent 主服务
 2. **astra_playground** - Web UI 界面
 3. **nova_sonic_server** - Nova Sonic 服务器
-4. **astra_graph_designer** - 图形设计器界面
 
 ## 📦 服务说明
 
@@ -52,12 +51,6 @@
 - **端口**: 3333
 - **环境变量**: AWS 凭证
 - **资源**: 1-2 vCPU, 2-4 GB 内存（可配置）
-
-### 4. astra_graph_designer
-- **镜像**: `agoraio/astra_graph_designer:0.1.0`
-- **端口**: 3001（映射到容器的 3000）
-- **环境变量**: 无
-- **资源**: 0.5-1 vCPU, 1-2 GB 内存（可配置）
 
 ## 🔧 前置要求
 
