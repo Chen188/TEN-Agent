@@ -4,6 +4,7 @@ import { useMemo, useState, useRef, useEffect } from "react"
 import dynamic from "next/dynamic"
 import Chat from "@/components/chat"
 import AuthInitializer from "@/components/authInitializer"
+import { AuthGuard } from "@/components/authGuard"
 import Menu from "@/components/menu"
 import { getRandomUserId, getRandomChannel, useAppDispatch, useSmallScreen, useAppSelector } from "@/common"
 import { setOptions } from "@/store/reducers/global"
@@ -49,40 +50,42 @@ export default function Home() {
   }
 
   return (
-    <AuthInitializer>
-      <main className={styles.home} style={{
-        minHeight: isSmallScreen ? "auto" : "830px"
-      }}>
-        <Header></Header>
-        {isSmallScreen ?
-          <div className={styles.smallScreen}>
-            <div className={styles.menuWrapper}>
-              <Menu onChange={onMenuChange}></Menu>
-            </div>
-            <div className={styles.bodyWrapper}>
-              <div className={styles.item} style={{
-                visibility: activeMenu == "Agent" ? "visible" : "hidden",
-                zIndex: activeMenu == "Agent" ? 1 : -1
-              }}>
-                <Rtc></Rtc>
+    <AuthGuard>
+      <AuthInitializer>
+        <main className={styles.home} style={{
+          minHeight: isSmallScreen ? "auto" : "830px"
+        }}>
+          <Header></Header>
+          {isSmallScreen ?
+            <div className={styles.smallScreen}>
+              <div className={styles.menuWrapper}>
+                <Menu onChange={onMenuChange}></Menu>
               </div>
-              <div className={styles.item}
-                ref={wrapperRef}
-                style={{
-                  visibility: activeMenu == "Chat" ? "visible" : "hidden",
-                  zIndex: activeMenu == "Chat" ? 1 : -1
+              <div className={styles.bodyWrapper}>
+                <div className={styles.item} style={{
+                  visibility: activeMenu == "Agent" ? "visible" : "hidden",
+                  zIndex: activeMenu == "Agent" ? 1 : -1
                 }}>
-                <Chat></Chat>
+                  <Rtc></Rtc>
+                </div>
+                <div className={styles.item}
+                  ref={wrapperRef}
+                  style={{
+                    visibility: activeMenu == "Chat" ? "visible" : "hidden",
+                    zIndex: activeMenu == "Chat" ? 1 : -1
+                  }}>
+                  <Chat></Chat>
+                </div>
               </div>
             </div>
-          </div>
-          :
-          <div className={styles.content} suppressHydrationWarning={true}>
-            <Rtc></Rtc>
-            <Chat></Chat>
-          </div>
-        }
-      </main>
-    </AuthInitializer>
+            :
+            <div className={styles.content} suppressHydrationWarning={true}>
+              <Rtc></Rtc>
+              <Chat></Chat>
+            </div>
+          }
+        </main>
+      </AuthInitializer>
+    </AuthGuard>
   )
 }

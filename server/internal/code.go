@@ -18,10 +18,12 @@ var (
 	codeErrGenerateTokenFailed = NewCode("10006", "generate token failed")
 	codeErrInvalidWebSocketUrl = NewCode("10007", "Invalid WebSocket URL")
 	codeErrUrlNotReachable     = NewCode("10008", "URL not reachable")
+	codeErrOAuthDisabled       = NewCode("10009", "OAuth is disabled")
 
 	codeErrProcessPropertyFailed = NewCode("10100", "process property json failed")
 	codeErrStartWorkerFailed     = NewCode("10101", "start worker failed")
 	codeErrStopWorkerFailed      = NewCode("10102", "stop worker failed")
+	codeErrTokenRefreshFailed    = NewCode("10104", "token refresh failed")
 )
 
 func NewCode(code string, msg string) *Code {

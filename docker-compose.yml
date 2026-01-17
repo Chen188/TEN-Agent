@@ -33,6 +33,14 @@ services:
             OPENAI_MODEL: ${OPENAI_MODEL}
             OPENAI_PROXY_URL: ${OPENAI_PROXY_URL}
             QWEN_API_KEY: ${QWEN_API_KEY}
+            OAUTH_ENABLED: ${OAUTH_ENABLED}
+            COGNITO_CLIENT_ID: ${COGNITO_CLIENT_ID}
+            COGNITO_CLIENT_SECRET: ${COGNITO_CLIENT_SECRET}
+            COGNITO_USER_POOL_ID: ${COGNITO_USER_POOL_ID}
+            COGNITO_DOMAIN: ${COGNITO_DOMAIN}
+            COGNITO_REGION: ${COGNITO_REGION}
+            OAUTH_REDIRECT_URL: ${OAUTH_REDIRECT_URL}
+            FRONTEND_URL: ${FRONTEND_URL}
     astra_playground_dev:
         image: node:20-alpine
         container_name: astra_playground_dev

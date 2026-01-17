@@ -1,0 +1,83 @@
+.loginPage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    background: linear-gradient(180deg, #0F0F11 0%, #1A1A1F 100%);
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 48px;
+        border-radius: 20px;
+        border: 1px solid #20272D;
+        background: linear-gradient(154deg, rgba(31, 69, 141, 0.16) 0%, rgba(31, 69, 141, 0.00) 30%),
+            linear-gradient(153deg, rgba(31, 54, 97, 0.00) 53.75%, #1F458D 100%),
+            rgba(15, 15, 17, 0.10);
+        box-shadow: 0px 4px 48px 0px rgba(0, 7, 72, 0.12);
+        backdrop-filter: blur(8.8px);
+        max-width: 420px;
+        width: 100%;
+        margin: 0 24px;
+    }
+
+    .logoWrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 32px;
+    }
+
+    .title {
+        color: var(--Grey-300, #EAECF0);
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.4;
+        margin: 0 0 12px 0;
+    }
+
+    .subtitle {
+        color: var(--Grey-500, #98A2B3);
+        text-align: center;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
+        margin: 0 0 32px 0;
+    }
+
+    .loginButton {
+        display: flex;
+        padding: 12px 32px;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        border-radius: 8px;
+        background: var(--primary-500-base, #0888FF);
+        box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+        border: none;
+        cursor: pointer;
+        color: var(---white, #FFF);
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        transition: background-color 0.2s ease;
+        min-width: 200px;
+
+        &:hover {
+            background: #0070E0;
+        }
+
+        &:active {
+            background: #0060C0;
+        }
+
+        &:focus {
+            outline: 2px solid rgba(8, 136, 255, 0.5);
+            outline-offset: 2px;
+        }
+    }
+}

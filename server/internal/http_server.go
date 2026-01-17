@@ -25,7 +25,9 @@ import (
 )
 
 type HttpServer struct {
-	config *HttpServerConfig
+	config         *HttpServerConfig
+	oauthConfig    *OAuthConfig
+	authMiddleware *AuthMiddleware
 }
 
 type HttpServerConfig struct {
@@ -85,14 +87,225 @@ type McpTestReq struct {
 }
 
 func NewHttpServer(httpServerConfig *HttpServerConfig) *HttpServer {
+	// Load OAuth configuration
+	oauthConfig := LoadOAuthConfig()
+
+	// Validate OAuth config if enabled
+	if err := oauthConfig.Validate(); err != nil {
+		slog.Warn("OAuth configuration validation failed", "error", err, logTag)
+	}
+
+	// Create auth middleware
+	authMiddleware := NewAuthMiddleware(oauthConfig)
+
 	return &HttpServer{
-		config: httpServerConfig,
+		config:         httpServerConfig,
+		oauthConfig:    oauthConfig,
+		authMiddleware: authMiddleware,
 	}
 }
 
 func (s *HttpServer) handlerHealth(c *gin.Context) {
 	slog.Debug("handlerHealth", logTag)
 	s.output(c, codeOk, nil)
+}
+
+// handlerOAuthConfig returns OAuth configuration for the frontend
+func (s *HttpServer) handlerOAuthConfig(c *gin.Context) {
+	slog.Debug("handlerOAuthConfig", logTag)
+
+	// Return only oauth_enabled - frontend uses /oauth/login and /oauth/logout for redirects
+	config := gin.H{
+		"oauth_enabled": s.oauthConfig.Enabled,
+	}
+
+	s.output(c, codeSuccess, config)
+}
+
+// handlerOAuthLogin redirects to Cognito login page
+func (s *HttpServer) handlerOAuthLogin(c *gin.Context) {
+	slog.Debug("handlerOAuthLogin", logTag)
+
+	if !s.oauthConfig.Enabled {
+		s.output(c, codeErrOAuthDisabled, http.StatusBadRequest)
+		return
+	}
+
+	// Build authorization URL with required parameters
+	params := url.Values{}
+	params.Set("response_type", "code")
+	params.Set("client_id", s.oauthConfig.ClientID)
+	params.Set("redirect_uri", s.oauthConfig.RedirectURL)
+	params.Set("scope", "openid email profile")
+
+	// Include state parameter if provided (for CSRF protection)
+	if state := c.Query("state"); state != "" {
+		params.Set("state", state)
+	}
+
+	authURL := fmt.Sprintf("%s?%s", s.oauthConfig.AuthorizeURL, params.Encode())
+	c.Redirect(http.StatusFound, authURL)
+}
+
+// handlerOAuthLogout redirects to Cognito logout page
+func (s *HttpServer) handlerOAuthLogout(c *gin.Context) {
+	slog.Debug("handlerOAuthLogout", logTag)
+
+	if !s.oauthConfig.Enabled {
+		s.output(c, codeErrOAuthDisabled, http.StatusBadRequest)
+		return
+	}
+
+	// Build logout URL - redirect back to frontend after logout
+	// Cognito logout endpoint accepts either:
+	// 1. logout_uri + client_id - redirects to custom sign-out page (must be in Allowed sign-out URLs)
+	// 2. redirect_uri + client_id + response_type + scope - redirects to login page
+	// We use logout_uri for simpler flow - just signs out and redirects to frontend
+	params := url.Values{}
+	params.Set("client_id", s.oauthConfig.ClientID)
+	params.Set("logout_uri", s.oauthConfig.FrontendURL)
+
+	logoutURL := fmt.Sprintf("%s?%s", s.oauthConfig.LogoutURL, params.Encode())
+	slog.Info("handlerOAuthLogout redirecting", "logoutURL", logoutURL, logTag)
+	c.Redirect(http.StatusFound, logoutURL)
+}
+
+// handlerOAuthCallback handles the OAuth callback from Cognito
+// Exchanges code for tokens and redirects to frontend with tokens in URL fragment
+func (s *HttpServer) handlerOAuthCallback(c *gin.Context) {
+	slog.Debug("handlerOAuthCallback", logTag)
+
+	// Use configured frontend URL for redirects
+	frontendURL := s.oauthConfig.FrontendURL
+
+	// Handle OAuth error response
+	if errorParam := c.Query("error"); errorParam != "" {
+		errorDesc := c.Query("error_description")
+		slog.Error("handlerOAuthCallback OAuth error", "error", errorParam, "description", errorDesc, logTag)
+		// Redirect to frontend with error
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s?auth_error=%s", frontendURL, url.QueryEscape(errorDesc)))
+		return
+	}
+
+	// Get authorization code
+	code := c.Query("code")
+	if code == "" {
+		slog.Error("handlerOAuthCallback no code", logTag)
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s?auth_error=%s", frontendURL, url.QueryEscape("No authorization code received")))
+		return
+	}
+
+	// Exchange code for tokens
+	formData := url.Values{}
+	formData.Set("grant_type", "authorization_code")
+	formData.Set("client_id", s.oauthConfig.ClientID)
+	formData.Set("client_secret", s.oauthConfig.ClientSecret)
+	formData.Set("code", code)
+	formData.Set("redirect_uri", s.oauthConfig.RedirectURL)
+
+	res, err := HttpClient.R().
+		SetHeader("Content-Type", "application/x-www-form-urlencoded").
+		SetBody(formData.Encode()).
+		Post(s.oauthConfig.TokenURL)
+
+	if err != nil {
+		slog.Error("handlerOAuthCallback token exchange failed", "err", err, logTag)
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s?auth_error=%s", frontendURL, url.QueryEscape("Token exchange failed")))
+		return
+	}
+
+	if res.StatusCode() != http.StatusOK {
+		slog.Error("handlerOAuthCallback token exchange HTTP error", "status", res.StatusCode(), "body", string(res.Body()), logTag)
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s?auth_error=%s", frontendURL, url.QueryEscape("Token exchange failed")))
+		return
+	}
+
+	// Parse token response
+	var tokenResponse struct {
+		AccessToken  string `json:"access_token"`
+		IdToken      string `json:"id_token"`
+		RefreshToken string `json:"refresh_token"`
+		ExpiresIn    int    `json:"expires_in"`
+		TokenType    string `json:"token_type"`
+	}
+
+	if err := json.Unmarshal(res.Body(), &tokenResponse); err != nil {
+		slog.Error("handlerOAuthCallback JSON parsing failed", "err", err, logTag)
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s?auth_error=%s", frontendURL, url.QueryEscape("Failed to parse tokens")))
+		return
+	}
+
+	slog.Info("handlerOAuthCallback success", logTag)
+
+	// Redirect to frontend with tokens in URL fragment (hash)
+	// Using fragment (#) so tokens don't get logged in server access logs
+	fragment := url.Values{}
+	fragment.Set("access_token", tokenResponse.AccessToken)
+	fragment.Set("id_token", tokenResponse.IdToken)
+	fragment.Set("refresh_token", tokenResponse.RefreshToken)
+	fragment.Set("expires_in", fmt.Sprintf("%d", tokenResponse.ExpiresIn))
+
+	// Include state if it was provided (for CSRF verification on frontend)
+	if state := c.Query("state"); state != "" {
+		fragment.Set("state", state)
+	}
+
+	redirectURL := fmt.Sprintf("%s#%s", frontendURL, fragment.Encode())
+	c.Redirect(http.StatusFound, redirectURL)
+}
+
+// handlerOAuthRefresh refreshes the access token using refresh token
+func (s *HttpServer) handlerOAuthRefresh(c *gin.Context) {
+	slog.Debug("handlerOAuthRefresh", logTag)
+
+	if !s.oauthConfig.Enabled {
+		s.output(c, codeErrOAuthDisabled, http.StatusBadRequest)
+		return
+	}
+
+	var req struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil || req.RefreshToken == "" {
+		slog.Error("handlerOAuthRefresh params invalid", "err", err, logTag)
+		s.output(c, codeErrParamsInvalid, http.StatusBadRequest)
+		return
+	}
+
+	// Exchange refresh token for new tokens
+	formData := url.Values{}
+	formData.Set("grant_type", "refresh_token")
+	formData.Set("client_id", s.oauthConfig.ClientID)
+	formData.Set("client_secret", s.oauthConfig.ClientSecret)
+	formData.Set("refresh_token", req.RefreshToken)
+
+	res, err := HttpClient.R().
+		SetHeader("Content-Type", "application/x-www-form-urlencoded").
+		SetBody(formData.Encode()).
+		Post(s.oauthConfig.TokenURL)
+
+	if err != nil {
+		slog.Error("handlerOAuthRefresh HTTP request failed", "err", err, logTag)
+		s.output(c, codeErrTokenRefreshFailed, http.StatusInternalServerError)
+		return
+	}
+
+	if res.StatusCode() != http.StatusOK {
+		slog.Error("handlerOAuthRefresh token refresh failed", "status", res.StatusCode(), "body", string(res.Body()), logTag)
+		c.Data(res.StatusCode(), "application/json", res.Body())
+		return
+	}
+
+	var tokenResponse map[string]interface{}
+	if err := json.Unmarshal(res.Body(), &tokenResponse); err != nil {
+		slog.Error("handlerOAuthRefresh JSON parsing failed", "err", err, logTag)
+		s.output(c, codeErrTokenRefreshFailed, http.StatusInternalServerError)
+		return
+	}
+
+	slog.Info("handlerOAuthRefresh end", logTag)
+	s.output(c, codeSuccess, tokenResponse)
 }
 
 func (s *HttpServer) handlerPing(c *gin.Context) {
@@ -402,15 +615,27 @@ func (s *HttpServer) Start() {
 	r := gin.Default()
 	r.Use(corsMiddleware())
 
+	// Public endpoints (no auth required)
 	r.GET("/", s.handlerHealth)
 	r.GET("/health", s.handlerHealth)
-	r.POST("/ping", s.handlerPing)
-	r.POST("/start", s.handlerStart)
-	r.POST("/stop", s.handlerStop)
-	r.POST("/token/generate", s.handlerGenerateToken)
-	r.POST("/mcp/info", s.handlerMcpInfo)
+	r.GET("/oauth/config", s.handlerOAuthConfig)
+	r.GET("/oauth/login", s.handlerOAuthLogin)
+	r.GET("/oauth/logout", s.handlerOAuthLogout)
+	r.GET("/oauth/callback", s.handlerOAuthCallback)
+	r.POST("/oauth/refresh", s.handlerOAuthRefresh)
 
-	slog.Info("server start", "port", s.config.Port, logTag)
+	// Protected endpoints (auth required when OAuth enabled)
+	protected := r.Group("/")
+	protected.Use(s.authMiddleware.Authenticate())
+	{
+		protected.POST("/ping", s.handlerPing)
+		protected.POST("/start", s.handlerStart)
+		protected.POST("/stop", s.handlerStop)
+		protected.POST("/token/generate", s.handlerGenerateToken)
+		protected.POST("/mcp/info", s.handlerMcpInfo)
+	}
+
+	slog.Info("server start", "port", s.config.Port, "oauth_enabled", s.oauthConfig.Enabled, logTag)
 
 	go cleanWorker()
 	r.Run(fmt.Sprintf(":%s", s.config.Port))

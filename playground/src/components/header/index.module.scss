@@ -45,6 +45,54 @@
     align-items: center;
     gap: 12px;
 
+    .userInfo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--Grey-300, #EAECF0);
+      font-size: 14px;
+      cursor: default;
+
+      .userName {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .userDropdown {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--Grey-300, #EAECF0);
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .userName {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .dropdownArrow {
+        font-size: 10px;
+        margin-left: 2px;
+      }
+    }
+
     .iconWrapper {
       display: flex;
       align-items: center;
@@ -64,5 +112,26 @@
     .githubWrapper {
       cursor: pointer;
     }
+  }
+}
+
+// User menu dropdown header styles
+.userMenuHeader {
+  padding: 4px 0;
+  min-width: 180px;
+
+  .userMenuName {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--Grey-300, #EAECF0);
+    margin-bottom: 4px;
+  }
+
+  .userMenuEmail {
+    font-size: 12px;
+    color: var(--Grey-500, #98A2B3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 }

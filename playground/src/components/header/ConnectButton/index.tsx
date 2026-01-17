@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useImperativeHandle, forwardRef } from "react"
 import {
     useAppSelector,
     useAppDispatch,
@@ -15,7 +15,15 @@ import styles from "./index.module.scss"
 
 let intervalId: any
 
-const ConnectButton = () => {
+interface ConnectButtonProps {
+    onConnectClick?: () => void;  // Override default connect behavior
+}
+
+export interface ConnectButtonRef {
+    triggerConnect: () => Promise<void>;
+}
+
+const ConnectButton = forwardRef<ConnectButtonRef, ConnectButtonProps>(({ onConnectClick }, ref) => {
     const dispatch = useAppDispatch()
     const agentConnected = useAppSelector(state => state.global.agentConnected)
     const channel = useAppSelector(state => state.global.options.channel)
@@ -88,15 +96,12 @@ const ConnectButton = () => {
         }
     }, [])
 
-    const onClickConnect = async () => {
+    // Extracted connect logic that can be called externally
+    const triggerConnect = async () => {
         if (loading) return
 
         setLoading(true)
-        if (agentConnected) {
-            await apiStopService(channel)
-            dispatch(setAgentConnected(false))
-            stopPing()
-        } else {
+        try {
             const res = await apiStartService({
                 channel,
                 userId,
@@ -128,14 +133,41 @@ const ConnectButton = () => {
                         content: `code:${res?.code},msg:${res?.msg}`
                     })
                 }
-                setLoading(false)
                 throw new Error(res?.msg)
             }
 
             dispatch(setAgentConnected(true))
             startPing()
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
+    }
+
+    // Expose triggerConnect via ref for external use
+    useImperativeHandle(ref, () => ({
+        triggerConnect
+    }))
+
+    const onClickConnect = async () => {
+        if (loading) return
+
+        if (agentConnected) {
+            // Disconnect immediately without showing settings dialog
+            setLoading(true)
+            await apiStopService(channel)
+            dispatch(setAgentConnected(false))
+            stopPing()
+            setLoading(false)
+        } else {
+            // When disconnected, check if we should override the connect behavior
+            if (onConnectClick) {
+                // Call the override handler (opens settings dialog)
+                onConnectClick()
+            } else {
+                // Default behavior: connect directly
+                await triggerConnect()
+            }
+        }
     }
 
     const startPing = () => {
@@ -160,6 +192,8 @@ const ConnectButton = () => {
             </span>
         </div>
     )
-}
+})
+
+ConnectButton.displayName = 'ConnectButton'
 
 export default ConnectButton

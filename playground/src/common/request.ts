@@ -1,5 +1,7 @@
 import { REQUEST_URL } from "./constant"
 import { genUUID } from "./utils"
+import { getAccessToken, getRefreshToken, isTokenExpired } from "../services/tokenStorage"
+import { fetchOAuthConfig, refreshAccessToken } from "../services/oauthService"
 
 interface StartRequestConfig {
   channel: string
@@ -26,6 +28,57 @@ interface GenAgoraDataConfig {
   channel: string
 }
 
+/**
+ * Get authorization headers for API requests
+ * Handles token refresh if needed
+ */
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  }
+
+  let token = getAccessToken()
+
+  // If token is expired, try to refresh
+  if (!token || isTokenExpired()) {
+    const refreshToken = getRefreshToken()
+    if (refreshToken) {
+      try {
+        const config = await fetchOAuthConfig()
+        if (config.oauthEnabled) {
+          await refreshAccessToken(refreshToken)
+          token = getAccessToken()
+        }
+      } catch (error) {
+        console.error('Failed to refresh token:', error)
+      }
+    }
+  }
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`
+  }
+
+  return headers
+}
+
+/**
+ * Handle API response, checking for 401 errors
+ */
+async function handleResponse(response: Response): Promise<any> {
+  if (response.status === 401) {
+    // Token might be invalid, try to refresh and redirect if needed
+    const config = await fetchOAuthConfig()
+    if (config.oauthEnabled) {
+      // Clear tokens and redirect to login
+      const { clearTokens } = await import("../services/tokenStorage")
+      clearTokens()
+      window.location.href = "/"
+    }
+  }
+  return response.json()
+}
+
 export const apiGenAgoraData = async (config: GenAgoraDataConfig) => {
   const url = `${REQUEST_URL}/token/generate`
   const { userId, channel } = config
@@ -34,14 +87,13 @@ export const apiGenAgoraData = async (config: GenAgoraDataConfig) => {
     uid: userId,
     channel_name: channel
   }
+  const headers = await getAuthHeaders()
   let resp: any = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify(data),
   })
-  resp = (await resp.json()) || {}
+  resp = await handleResponse(resp)
   return resp
 }
 
@@ -87,14 +139,13 @@ export const apiStartService = async (config: StartRequestConfig): Promise<any> 
     nova_sonic_ws_url: novaSonicWsUrl || "",
     turn_taking_pause_sensitivity: turnTakingPauseSensitivity || "MEDIUM",
   }
+  const headers = await getAuthHeaders()
   let resp: any = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify(data),
   })
-  resp = (await resp.json()) || {}
+  resp = await handleResponse(resp)
   return resp
 }
 
@@ -104,14 +155,13 @@ export const apiStopService = async (channel: string) => {
     request_id: genUUID(),
     channel_name: channel
   }
+  const headers = await getAuthHeaders()
   let resp = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify(data),
   })
-  resp = (await resp.json()) || {}
+  resp = await handleResponse(resp)
   return resp
 }
 
@@ -122,14 +172,13 @@ export const apiPing = async (channel: string) => {
     request_id: genUUID(),
     channel_name: channel
   }
+  const headers = await getAuthHeaders()
   let resp = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify(data),
   })
-  resp = (await resp.json()) || {}
+  resp = await handleResponse(resp)
   return resp
 }
 
@@ -141,13 +190,12 @@ export const apiMcpInfo = async (api_base: string, api_key: string, sub_path: st
     api_key: api_key,
     sub_path: sub_path
   }
+  const headers = await getAuthHeaders()
   let resp = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify(data),
   })
-  resp = (await resp.json()) || {}
+  resp = await handleResponse(resp)
   return resp
 }

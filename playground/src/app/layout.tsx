@@ -1,5 +1,6 @@
 import { ConfigProvider } from "antd"
 import { StoreProvider } from "@/store";
+import { AuthProvider } from "@/providers/AuthProvider";
 import "@/css/globals.css";
 import type { Metadata, Viewport } from "next";
 
@@ -42,9 +43,11 @@ export default function RootLayout({
             },
           }}
         >
-          <StoreProvider>
-            {children}
-          </StoreProvider>
+          <AuthProvider>
+            <StoreProvider>
+              {children}
+            </StoreProvider>
+          </AuthProvider>
         </ConfigProvider>
       </body>
     </html>
