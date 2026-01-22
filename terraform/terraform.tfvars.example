@@ -1,0 +1,138 @@
+# Terraform Variables Example File
+# Copy this file to terraform.tfvars and fill in your values
+# IMPORTANT: Never commit terraform.tfvars to version control!
+
+#------------------------------------------------------------------------------
+# General Configuration
+#------------------------------------------------------------------------------
+
+# Project name used as prefix for all resources
+project_name = "astra"
+
+# Environment name (dev, staging, prod)
+environment = "dev"
+
+# AWS region for deployment
+aws_region = "us-east-1"
+
+# Single availability zone for cost optimization
+availability_zone = "us-east-1a"
+
+#------------------------------------------------------------------------------
+# Network Configuration
+#------------------------------------------------------------------------------
+
+# CIDR block for the VPC
+vpc_cidr = "10.0.0.0/16"
+
+# CIDR block for the public subnet
+public_subnet_cidr = "10.0.1.0/24"
+
+# CIDR block for the private subnet
+private_subnet_cidr = "10.0.2.0/24"
+
+#------------------------------------------------------------------------------
+# Domain Configuration
+#------------------------------------------------------------------------------
+
+# Base domain name (must exist in Route 53)
+domain_name = "example.com"
+
+# Subdomain for frontend service
+frontend_subdomain = "astra"
+
+# Subdomain for backend service
+backend_subdomain = "astra-backend"
+
+#------------------------------------------------------------------------------
+# Agora Configuration (REQUIRED - Sensitive)
+#------------------------------------------------------------------------------
+
+# Agora App ID - Get from Agora Console
+agora_app_id = "your-agora-app-id"
+
+# Agora App Certificate - Get from Agora Console
+agora_app_certificate = "your-agora-app-certificate"
+
+#------------------------------------------------------------------------------
+# AWS Credentials for Services (REQUIRED - Sensitive)
+# These credentials are used by the containerized services
+#------------------------------------------------------------------------------
+
+# AWS Access Key ID for services
+aws_access_key_id = "your-aws-access-key-id"
+
+# AWS Secret Access Key for services
+aws_secret_access_key = "your-aws-secret-access-key"
+
+#------------------------------------------------------------------------------
+# AWS Bedrock Configuration
+#------------------------------------------------------------------------------
+
+# AWS Bedrock model identifier
+aws_bedrock_model = "anthropic.claude-3-sonnet-20240229-v1:0"
+
+#------------------------------------------------------------------------------
+# TTS API Keys (Optional - Sensitive)
+#------------------------------------------------------------------------------
+
+# Cosy TTS API key (leave empty if not using)
+cosy_tts_key = ""
+
+# ElevenLabs TTS API key (leave empty if not using)
+elevenlabs_tts_key = ""
+
+#------------------------------------------------------------------------------
+# OAuth / Cognito Configuration (Optional)
+#------------------------------------------------------------------------------
+
+# Enable OAuth authentication
+oauth_enabled = false
+
+# Cognito Client ID (required if oauth_enabled = true)
+cognito_client_id = ""
+
+# Cognito Client Secret (required if oauth_enabled = true)
+cognito_client_secret = ""
+
+# Cognito User Pool ID (required if oauth_enabled = true)
+cognito_user_pool_id = ""
+
+# Cognito Domain (required if oauth_enabled = true)
+cognito_domain = ""
+
+# Cognito Region
+cognito_region = "us-east-1"
+
+#------------------------------------------------------------------------------
+# ECS Task Sizing
+# Adjust based on your workload requirements
+# Valid CPU values: 256, 512, 1024, 2048, 4096
+# Memory must be compatible with CPU (see AWS Fargate documentation)
+#------------------------------------------------------------------------------
+
+# Backend service resources
+backend_cpu    = 256
+backend_memory = 512
+
+# Frontend service resources
+frontend_cpu    = 256
+frontend_memory = 512
+
+# Nova Sonic service resources
+nova_sonic_cpu    = 256
+nova_sonic_memory = 512
+
+#------------------------------------------------------------------------------
+# Cost Optimization
+#------------------------------------------------------------------------------
+
+# Use Fargate Spot for cost savings (may cause interruptions)
+use_fargate_spot = false
+
+#------------------------------------------------------------------------------
+# ECR Configuration
+#------------------------------------------------------------------------------
+
+# Number of images to retain in ECR repositories
+ecr_image_retention_count = 10

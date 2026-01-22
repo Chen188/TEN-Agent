@@ -15,6 +15,7 @@ crash_context_v1
 .deps/
 .DS_Store
 .env
+.env.production
 /.gn
 /.gnfiles
 include/
@@ -35,3 +36,20 @@ xdump_config
 /tmp
 
 .kiro
+
+
+# Terraform
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.terraform/
+.terraform.lock.hcl
