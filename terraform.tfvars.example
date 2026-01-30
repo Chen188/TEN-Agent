@@ -1,0 +1,160 @@
+# ==============================================================================
+# TEN-Agent Terraform Configuration Example
+# ==============================================================================
+# 复制此文件为 terraform.tfvars 并填入实际值
+# 注意: terraform.tfvars 包含敏感信息，不应提交到版本控制
+
+# ==============================================================================
+# 基础配置
+# ==============================================================================
+
+project_name = "ten-agent"
+environment  = "dev"  # 选项: dev, staging, prod
+aws_region   = "us-east-1"
+owner_tag    = "Your Team Name"
+
+# ==============================================================================
+# 网络配置
+# ==============================================================================
+
+vpc_cidr               = "10.0.0.0/16"
+availability_zones_count = 2
+enable_nat_gateway     = true
+single_nat_gateway     = true  # dev: true, prod: false
+
+# ==============================================================================
+# ECS 资源配置
+# ==============================================================================
+
+ecs_task_cpu = {
+  agents     = "1024"  # dev: 512, staging: 1024, prod: 2048
+  playground = "512"
+  nova_sonic = "512"
+}
+
+ecs_task_memory = {
+  agents     = "2048"  # dev: 1024, staging: 2048, prod: 4096
+  playground = "1024"
+  nova_sonic = "1024"
+}
+
+ecs_service_desired_count = {
+  agents     = 1  # prod: 2-4
+  playground = 1
+  nova_sonic = 1
+}
+
+# ==============================================================================
+# 自动扩展配置
+# ==============================================================================
+
+enable_autoscaling = true
+
+ecs_service_min_capacity = {
+  agents     = 1
+  playground = 1
+  nova_sonic = 1
+}
+
+ecs_service_max_capacity = {
+  agents     = 4
+  playground = 2
+  nova_sonic = 2
+}
+
+autoscaling_cpu_target    = 70
+autoscaling_memory_target = 80
+
+# ==============================================================================
+# 日志和监控
+# ==============================================================================
+
+log_retention_days       = 7  # dev: 3, staging: 7, prod: 30
+enable_container_insights = true
+enable_ecs_exec          = false  # dev: true, prod: false
+
+# ==============================================================================
+# ALB 配置
+# ==============================================================================
+
+enable_deletion_protection = false  # prod: true
+enable_alb_access_logs    = false
+# alb_access_logs_bucket    = "your-alb-logs-bucket"  # 如果启用访问日志
+alb_idle_timeout          = 60
+
+# ==============================================================================
+# 域名和 SSL 配置（可选）
+# ==============================================================================
+
+enable_custom_domain = false
+# domain_name          = "ten-agent.example.com"
+# subdomain_agents     = "api"
+# subdomain_playground = "app"
+# subdomain_nova_sonic = "sonic"
+# route53_zone_id      = ""  # 留空则创建新的 hosted zone
+# certificate_validation_method = "DNS"
+
+# ==============================================================================
+# 安全配置
+# ==============================================================================
+
+enable_kms_encryption = false
+secret_recovery_window_days = 7
+create_secrets = true
+
+# 允许访问 ALB 的 CIDR 块（可选）
+# allowed_cidr_blocks = ["0.0.0.0/0"]
+
+# ==============================================================================
+# 应用配置
+# ==============================================================================
+
+# 服务端口
+server_port = 8080
+graph_designer_server_port = 49483
+
+# Worker 配置
+workers_max = 100
+worker_quit_timeout_seconds = 60
+
+# AI 服务配置
+aws_bedrock_model  = "anthropic.claude-v2"
+litellm_model      = "gpt-4o-mini"
+openai_model       = "gpt-4o-mini"
+openai_base_url    = ""
+openai_proxy_url   = ""
+
+# ==============================================================================
+# Docker 镜像配置（可选）
+# ==============================================================================
+
+# agents_image     = "ghcr.io/ten-framework/astra_agents_build:0.3.5"
+# playground_image = "node:20-alpine"
+# nova_sonic_image = "ghcr.io/chen188/nova-sonic-server:latest"
+
+# ==============================================================================
+# 注意事项
+# ==============================================================================
+# 
+# 1. 部署后必须更新 AWS Secrets Manager 中的密钥值：
+#    - AGORA_APP_ID
+#    - AGORA_APP_CERTIFICATE
+#    - AWS_ACCESS_KEY_ID (用于 Bedrock/Polly)
+#    - AWS_SECRET_ACCESS_KEY
+#    - AZURE_STT_KEY
+#    - AZURE_TTS_KEY
+#    - OPENAI_API_KEY
+#    等
+#
+# 2. 使用不同环境配置：
+#    terraform apply -var-file="environments/dev.tfvars"
+#    terraform apply -var-file="environments/staging.tfvars"
+#    terraform apply -var-file="environments/prod.tfvars"
+#
+# 3. 生产环境建议：
+#    - 使用 S3 backend 存储状态
+#    - 启用 deletion protection
+#    - 使用多个 NAT Gateways
+#    - 启用 CloudWatch Container Insights
+#    - 配置自定义域名和 SSL
+#

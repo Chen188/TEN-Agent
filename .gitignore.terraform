@@ -1,0 +1,42 @@
+# Terraform gitignore
+# Add these lines to your .gitignore file
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude all .tfvars files, which might contain sensitive data
+*.tfvars
+*.tfvars.json
+
+# Keep example files
+!*.tfvars.example
+
+# Ignore override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore environment files
+.env
+.env.*
+!.env.example
+
+# Ignore backup files
+*.backup
+*.bak
+
+# Ignore lock files (optional - some teams commit this)
+# .terraform.lock.hcl
